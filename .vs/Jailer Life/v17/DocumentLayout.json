@@ -1,0 +1,117 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\CMS\\Desktop\\Jailer Life\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|c:\\users\\cms\\desktop\\jailer life\\assets\\project\\scripts\\arrested\\prisonercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|solutionrelative:assets\\project\\scripts\\arrested\\prisonercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|C:\\Users\\CMS\\Desktop\\Jailer Life\\assets\\project\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|solutionrelative:assets\\project\\scripts\\player\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|C:\\Users\\CMS\\Desktop\\Jailer Life\\assets\\project\\scripts\\player\\stackmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|solutionrelative:assets\\project\\scripts\\player\\stackmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|C:\\Users\\CMS\\Desktop\\Jailer Life\\assets\\project\\scripts\\mining\\ore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|solutionrelative:assets\\project\\scripts\\mining\\ore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|C:\\Users\\CMS\\Desktop\\Jailer Life\\assets\\project\\scripts\\mining\\oremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC9C4955-40BC-1E3A-E911-3FE9927D0AAA}|Assembly-CSharp.csproj|solutionrelative:assets\\project\\scripts\\mining\\oremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4F124749-7C14-D3B7-AD7F-A2EBAFBBB9C5}|Assembly-CSharp-Editor.csproj|C:\\Users\\CMS\\Desktop\\Jailer Life\\assets\\thirdparty\\joystick pack\\scripts\\editor\\joystickeditor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4F124749-7C14-D3B7-AD7F-A2EBAFBBB9C5}|Assembly-CSharp-Editor.csproj|solutionrelative:assets\\thirdparty\\joystick pack\\scripts\\editor\\joystickeditor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PrisonerController.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Arrested\\PrisonerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Project\\Scripts\\Arrested\\PrisonerController.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Arrested\\PrisonerController.cs",
+              "RelativeToolTip": "Assets\\Project\\Scripts\\Arrested\\PrisonerController.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAYwF4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-31T09:06:00.614Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Player\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Project\\Scripts\\Player\\PlayerController.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Player\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Project\\Scripts\\Player\\PlayerController.cs",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAAAHQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T18:52:29.616Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "StackManager.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Player\\StackManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Project\\Scripts\\Player\\StackManager.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Player\\StackManager.cs",
+              "RelativeToolTip": "Assets\\Project\\Scripts\\Player\\StackManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T17:24:09.445Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "OreManager.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Mining\\OreManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Project\\Scripts\\Mining\\OreManager.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Mining\\OreManager.cs",
+              "RelativeToolTip": "Assets\\Project\\Scripts\\Mining\\OreManager.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAswBYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T15:23:04.36Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Ore.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Mining\\Ore.cs",
+              "RelativeDocumentMoniker": "Assets\\Project\\Scripts\\Mining\\Ore.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\Project\\Scripts\\Mining\\Ore.cs",
+              "RelativeToolTip": "Assets\\Project\\Scripts\\Mining\\Ore.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAIwDgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T14:58:40.946Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "JoystickEditor.cs",
+              "DocumentMoniker": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\ThirdParty\\Joystick Pack\\Scripts\\Editor\\JoystickEditor.cs",
+              "RelativeDocumentMoniker": "Assets\\ThirdParty\\Joystick Pack\\Scripts\\Editor\\JoystickEditor.cs",
+              "ToolTip": "C:\\Users\\CMS\\Desktop\\Jailer Life\\Assets\\ThirdParty\\Joystick Pack\\Scripts\\Editor\\JoystickEditor.cs",
+              "RelativeToolTip": "Assets\\ThirdParty\\Joystick Pack\\Scripts\\Editor\\JoystickEditor.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAYwCoAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T12:35:21.239Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
