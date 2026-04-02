@@ -22,6 +22,10 @@ public class HandcuffStackZone : Zone
     private List<GameObject> _stackedHandcuffs = new List<GameObject>();
     private bool _isTransferring;
 
+    [Header("낙하 연출")]
+    [SerializeField] private float dropDuration = 0.35f;
+    [SerializeField] private AnimationCurve landBounceCurve;
+
     private void Awake()
     {
         if (bounceCurve.keys.Length == 0)
@@ -30,6 +34,16 @@ public class HandcuffStackZone : Zone
                 new Keyframe(0f,    0f),
                 new Keyframe(0.5f,  1.3f),
                 new Keyframe(0.75f, 0.85f),
+                new Keyframe(1f,    1f)
+            );
+        }
+
+        if (landBounceCurve.keys.Length == 0)
+        {
+            landBounceCurve = new AnimationCurve(
+                new Keyframe(0f,    1f),
+                new Keyframe(0.35f, 1.3f),
+                new Keyframe(0.65f, 0.85f),
                 new Keyframe(1f,    1f)
             );
         }
@@ -76,7 +90,10 @@ public class HandcuffStackZone : Zone
         return transform.position + stackBaseOffset + new Vector3(0f, index * ySpacing, 0f);
     }
 
-    protected override void OnPlayerEnter(PlayerController player)
+    protected override void OnPlayerEnter(PlayerController player) => TryTransfer();
+    protected override void OnPlayerStay(PlayerController player) => TryTransfer();
+
+    private void TryTransfer()
     {
         if (_isTransferring) return;
         if (_stackedHandcuffs.Count == 0) return;
@@ -88,7 +105,9 @@ public class HandcuffStackZone : Zone
 
     private IEnumerator TransferToPlayer()
     {
-        for (int i = _stackedHandcuffs.Count - 1; i >= 0; i--)
+        int originalCount = _stackedHandcuffs.Count;
+
+        for (int i = originalCount - 1; i >= 0; i--)
         {
             GameObject handcuff = _stackedHandcuffs[i];
             if (handcuff == null) continue;
@@ -100,8 +119,60 @@ public class HandcuffStackZone : Zone
             yield return new WaitForSeconds(pickupInterval);
         }
 
+        // 루프 도중 SpawnSequence가 추가한 수갑들 → 1층으로 낙하
+        List<GameObject> excess = new List<GameObject>();
+        for (int i = originalCount; i < _stackedHandcuffs.Count; i++)
+            if (_stackedHandcuffs[i] != null) excess.Add(_stackedHandcuffs[i]);
+
         _stackedHandcuffs.Clear();
+
+        for (int i = 0; i < excess.Count; i++)
+        {
+            _stackedHandcuffs.Add(excess[i]);
+            StartCoroutine(DropToFloor(excess[i].transform, GetStackPosition(i)));
+        }
+
         _isTransferring = false;
+    }
+
+    private IEnumerator DropToFloor(Transform t, Vector3 target)
+    {
+        if (t == null) yield break;
+        Vector3 start = t.position;
+        float elapsed = 0f;
+
+        while (elapsed < dropDuration)
+        {
+            if (t == null) yield break;
+            elapsed += Time.deltaTime;
+            float p = Mathf.Clamp01(elapsed / dropDuration);
+            Vector3 pos = Vector3.Lerp(start, target, p);
+            pos.y += Mathf.Sin(p * Mathf.PI) * 0.4f;
+            t.position = pos;
+            yield return null;
+        }
+
+        if (t == null) yield break;
+        t.position = target;
+        yield return StartCoroutine(LandBounce(t));
+    }
+
+    private IEnumerator LandBounce(Transform t)
+    {
+        if (t == null) yield break;
+        float duration = 0.3f;
+        float elapsed = 0f;
+        Vector3 baseScale = t.localScale;
+
+        while (elapsed < duration)
+        {
+            if (t == null) yield break;
+            elapsed += Time.deltaTime;
+            t.localScale = baseScale * landBounceCurve.Evaluate(elapsed / duration);
+            yield return null;
+        }
+
+        if (t != null) t.localScale = baseScale;
     }
 
     private IEnumerator FlyHandcuff(GameObject handcuff)

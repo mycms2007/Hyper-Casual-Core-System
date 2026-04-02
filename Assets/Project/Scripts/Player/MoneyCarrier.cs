@@ -21,10 +21,11 @@ public class MoneyCarrier : MonoBehaviour
             stackManager.TryAdd(coinPrefab);
     }
 
-    public void SpendMoney(int amount)
+    public void SpendMoney(int remainingMoney)
     {
-        int count = Mathf.CeilToInt((float)amount / wonPerCoin);
-        for (int i = 0; i < count; i++)
+        int target = remainingMoney / wonPerCoin;
+        int toRemove = stackManager.Count - target;
+        for (int i = 0; i < toRemove; i++)
         {
             GameObject removed = stackManager.TryRemove();
             if (removed != null) Destroy(removed);

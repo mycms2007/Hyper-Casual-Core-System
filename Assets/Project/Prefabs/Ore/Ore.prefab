@@ -99,8 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 1
   oreBreakEffect: {fileID: 6177832814050230739, guid: e3d8d4ebfdd02a347909d6413713d2bc, type: 3}
-  gemPrefab: {fileID: 7241407426793275976, guid: b390f95143b23d34caef590df068b0e1, type: 3}
-  stackManager: {fileID: 0}
+  gemPrefab: {fileID: 5891251366850831439, guid: 6528376df37e5a747b25682e44d8d1d9, type: 3}
 --- !u!65 &139966161672831851
 BoxCollider:
   m_ObjectHideFlags: 0

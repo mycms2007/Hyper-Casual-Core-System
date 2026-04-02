@@ -11,6 +11,12 @@ public abstract class Zone : MonoBehaviour
         if (alba != null) OnAlbaEnter(alba);
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        PlayerController player = other.GetComponentInParent<PlayerController>();
+        if (player != null) OnPlayerStay(player);
+    }
+
     private void OnTriggerExit(Collider other)
     {
         PlayerController player = other.GetComponentInParent<PlayerController>();
@@ -21,6 +27,7 @@ public abstract class Zone : MonoBehaviour
     }
 
     protected virtual void OnPlayerEnter(PlayerController player) { }
+    protected virtual void OnPlayerStay(PlayerController player) { }
     protected virtual void OnPlayerExit(PlayerController player) { }
     protected virtual void OnAlbaEnter(AlbaController alba) { }
     protected virtual void OnAlbaExit(AlbaController alba) { }

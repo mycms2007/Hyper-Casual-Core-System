@@ -13,6 +13,13 @@ public class MiningTrigger : MonoBehaviour
     private List<Ore> _oresInRange = new List<Ore>();
     private bool _isMining;
     private Coroutine _miningOffCoroutine;
+    private bool _drillPurchased;
+
+    public void UnlockDrill()
+    {
+        _drillPurchased = true;
+        Debug.Log($"[MiningTrigger] UnlockDrill 호출됨 — drillObject={drillObject}");
+    }
 
     private bool IsDrillEquipped => drillObject != null && drillObject.activeSelf;
     private bool IsDrillCarPurchased => DrillCar.Instance != null && DrillCar.Instance.IsPurchased;
@@ -25,6 +32,7 @@ public class MiningTrigger : MonoBehaviour
         _oresInRange.Add(ore);
 
         // 드릴차 구매 완료 → 드릴차 발진
+        Debug.Log($"[MiningTrigger] 광물 감지 — IsDrillCarPurchased={IsDrillCarPurchased}, _drillPurchased={_drillPurchased}");
         if (IsDrillCarPurchased)
         {
             DrillCar.Instance.StartDrive(
@@ -35,9 +43,20 @@ public class MiningTrigger : MonoBehaviour
             return;
         }
 
+        // 드릴 구매 완료 → 광물 접촉 시 장착
+        if (_drillPurchased && drillObject != null)
+        {
+            Debug.Log($"[MiningTrigger] drillObject.SetActive(true) 호출");
+            drillObject.SetActive(true);
+        }
+
         // 손 드릴 장착 → 즉사
         if (IsDrillEquipped)
+        {
             while (!ore.IsDead) ore.TakeDamage();
+            _isMining = true;
+            if (player != null) player.SetForceIdle(true);
+        }
 
         UpdateMiningState();
     }
@@ -81,7 +100,7 @@ public class MiningTrigger : MonoBehaviour
             if (!_isMining)
             {
                 _isMining = true;
-                if (player != null) player.SetMiningActive(true);
+                if (player != null && !IsDrillEquipped) player.SetMiningActive(true);
             }
         }
         else if (_isMining && _miningOffCoroutine == null)
@@ -100,7 +119,8 @@ public class MiningTrigger : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         _isMining = false;
-        if (player != null) player.SetMiningActive(false);
+        if (player != null && !IsDrillEquipped) player.SetMiningActive(false);
+        if (drillObject != null) drillObject.SetActive(false);
         _miningOffCoroutine = null;
     }
 

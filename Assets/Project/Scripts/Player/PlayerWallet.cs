@@ -4,6 +4,7 @@ public class PlayerWallet : MonoBehaviour
 {
     public static PlayerWallet Instance { get; private set; }
     public static event System.Action OnFirstMoneyEarned;
+    public static event System.Action<int> OnBalanceChanged;
 
     [SerializeField] private HUDManager hud;
 
@@ -28,6 +29,7 @@ public class PlayerWallet : MonoBehaviour
                 _firstMoneyFired = true;
                 OnFirstMoneyEarned?.Invoke();
             }
+            OnBalanceChanged?.Invoke(_money);
         }
     }
 
@@ -36,7 +38,7 @@ public class PlayerWallet : MonoBehaviour
         if (_money < amount) return false;
         _money -= amount;
         hud?.SetMoney(_money);
-        MoneyCarrier.Instance?.SpendMoney(amount);
+        MoneyCarrier.Instance?.SpendMoney(_money);
         return true;
     }
 }

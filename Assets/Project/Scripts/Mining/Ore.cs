@@ -5,7 +5,7 @@ public class Ore : MonoBehaviour
     [SerializeField] private int maxHp = 3;
     [SerializeField] private GameObject oreBreakEffect;
     [SerializeField] private GameObject gemPrefab;
-    private StackManager _stackManager;
+    private GemCarrier _gemCarrier;
 
     private int _currentHp;
     private MeshRenderer _mesh;
@@ -13,11 +13,11 @@ public class Ore : MonoBehaviour
     private bool _isDead;
     public bool IsDead => _isDead;
 
-    public void Init(Transform spawnPoint, StackManager stackManager)
+    public void Init(Transform spawnPoint, GemCarrier gemCarrier)
     {
         _mesh = GetComponentInChildren<MeshRenderer>();
         _spawnPoint = spawnPoint;
-        _stackManager = stackManager;
+        _gemCarrier = gemCarrier;
         _currentHp = maxHp;
         _isDead = false;
         _mesh.enabled = true;
@@ -38,8 +38,9 @@ public class Ore : MonoBehaviour
         if (oreBreakEffect != null)
             Instantiate(oreBreakEffect, transform.position, Quaternion.identity);
 
-        if (gemPrefab != null && _stackManager != null)
-            _stackManager.TryAdd(gemPrefab);
+        Debug.Log($"[Ore] Die() — gemPrefab: {(gemPrefab != null ? gemPrefab.name : "NULL")}, _gemCarrier: {(_gemCarrier != null ? "OK" : "NULL")}");
+        if (gemPrefab != null && _gemCarrier != null)
+            _gemCarrier.TryAdd(gemPrefab);
 
         OreManager.Instance.ScheduleRespawn(this, _spawnPoint);
     }

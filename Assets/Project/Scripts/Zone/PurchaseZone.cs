@@ -28,6 +28,7 @@ public class PurchaseZone : MonoBehaviour
     private bool _purchased;
     private bool _ready;
     private bool _isHolding;
+    private float _holdProgress;
 
     public bool IsPurchased => _purchased;
 
@@ -48,10 +49,7 @@ public class PurchaseZone : MonoBehaviour
     private void Start()
     {
         if (zoneVisual != null)
-        {
-            zoneVisual.SetActive(false);
             zoneVisual.transform.localScale = Vector3.zero;
-        }
         if (fillImage != null) fillImage.fillAmount = 0f;
 
         if (trigger == ActivationTrigger.None)
@@ -68,12 +66,14 @@ public class PurchaseZone : MonoBehaviour
             OnTriggerConditionMet();
         }
 
-        if (_isHolding && !_purchased && _ready && fillImage != null)
+        if (_isHolding && !_purchased && _ready)
         {
-            fillImage.fillAmount -= Time.deltaTime / holdDuration;
-            if (fillImage.fillAmount <= 0f)
+            _holdProgress -= Time.deltaTime / holdDuration;
+            if (fillImage != null) fillImage.fillAmount = _holdProgress;
+            if (_holdProgress <= 0f)
             {
-                fillImage.fillAmount = 0f;
+                _holdProgress = 0f;
+                if (fillImage != null) fillImage.fillAmount = 0f;
                 if (PlayerWallet.Instance != null && PlayerWallet.Instance.Spend(price))
                     Purchase();
                 else
@@ -84,6 +84,7 @@ public class PurchaseZone : MonoBehaviour
 
     private void OnTriggerConditionMet()
     {
+        Debug.Log($"[PurchaseZone] {gameObject.name} — OnTriggerConditionMet 호출됨 (ready={_ready}, purchased={_purchased})");
         if (_ready || _purchased) return;
 
         if (purchaseCooldown > 0f)
@@ -95,20 +96,28 @@ public class PurchaseZone : MonoBehaviour
     private void BecomeReady()
     {
         _ready = true;
+        Debug.Log($"[PurchaseZone] {gameObject.name} — BecomeReady 호출됨 (zoneVisual={zoneVisual})");
 
         if (zoneVisual != null)
         {
             zoneVisual.SetActive(true);
             StartCoroutine(SpringAppear(zoneVisual.transform));
         }
+        else
+        {
+            Debug.LogWarning($"[PurchaseZone] {gameObject.name} — zoneVisual이 null입니다! 인스펙터에서 연결을 확인하세요.");
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"[PurchaseZone] {gameObject.name} OnTriggerEnter — purchased={_purchased}, ready={_ready}, collider={other.name}");
         if (_purchased || !_ready) return;
         if (other.GetComponentInParent<PlayerController>() == null) return;
 
+        Debug.Log($"[PurchaseZone] {gameObject.name} — 플레이어 감지, 구매 시작");
         _isHolding = true;
+        _holdProgress = 1f;
         if (fillImage != null) fillImage.fillAmount = 1f;
     }
 
@@ -117,6 +126,7 @@ public class PurchaseZone : MonoBehaviour
         if (other.GetComponentInParent<PlayerController>() == null) return;
 
         _isHolding = false;
+        _holdProgress = 0f;
         if (fillImage != null) fillImage.fillAmount = 0f;
     }
 
@@ -128,6 +138,14 @@ public class PurchaseZone : MonoBehaviour
 
         foreach (GameObject target in activateTargets)
             if (target != null) target.SetActive(true);
+
+        // 존 오브젝트 및 자식의 렌더러 숨김
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = false;
+
+        // Canvas UI 숨김
+        foreach (Canvas c in GetComponentsInChildren<Canvas>())
+            c.gameObject.SetActive(false);
 
         if (zoneVisual != null)
             StartCoroutine(SpringDisappear(zoneVisual.transform, () => zoneVisual.SetActive(false)));

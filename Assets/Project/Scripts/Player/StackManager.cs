@@ -37,12 +37,24 @@ public class StackManager : MonoBehaviour
 
     public bool TryAdd(GameObject itemPrefab, Vector3 rotationOffset = default)
     {
-        if (stackRoot == null || _stack.Count >= maxCapacity) return false;
-
-        GameObject obj = Instantiate(itemPrefab);
-        StackItem item = obj.AddComponent<StackItem>();
+        if (stackRoot == null)
+        {
+            Debug.LogWarning("[StackManager] TryAdd 실패 — stackRoot가 null");
+            return false;
+        }
+        if (_stack.Count >= maxCapacity)
+        {
+            Debug.LogWarning($"[StackManager] TryAdd 실패 — 최대치 도달 ({_stack.Count}/{maxCapacity})");
+            return false;
+        }
 
         Transform target = _stack.Count == 0 ? stackRoot : _stack[_stack.Count - 1].transform;
+        Vector3 spawnPos = target.position + Vector3.up * itemSpacing;
+
+        GameObject obj = Instantiate(itemPrefab, spawnPos, Quaternion.identity);
+        obj.SetActive(true);
+        StackItem item = obj.AddComponent<StackItem>();
+
         item.Initialize(target, Vector3.up * itemSpacing, followSpeed, rotationSpeed, swayAmount, rotationOffset);
 
         _stack.Add(item);

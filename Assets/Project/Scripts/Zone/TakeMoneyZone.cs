@@ -53,6 +53,7 @@ public class TakeMoneyZone : MonoBehaviour
         while (elapsed < flyDuration)
         {
             if (coin == null) yield break;
+            if (_pendingCollect) { StartCoroutine(ShrinkAndDestroy(coin)); yield break; }
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / flyDuration);
             Vector3 pos = Vector3.Lerp(start, target, t);
@@ -63,7 +64,10 @@ public class TakeMoneyZone : MonoBehaviour
         if (coin != null)
         {
             coin.transform.position = target;
-            StartCoroutine(LandCoin(coin));
+            if (_pendingCollect)
+                StartCoroutine(ShrinkAndDestroy(coin));
+            else
+                StartCoroutine(LandCoin(coin));
         }
     }
 
@@ -80,8 +84,19 @@ public class TakeMoneyZone : MonoBehaviour
     }
 
     private bool _isCollecting;
+    private bool _pendingCollect;
 
     private void OnTriggerEnter(Collider other)
+    {
+        TryCollect(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        TryCollect(other);
+    }
+
+    private void TryCollect(Collider other)
     {
         if (_totalMoney <= 0 || _isCollecting) return;
         if (other.GetComponentInParent<PlayerController>() == null) return;
@@ -92,6 +107,8 @@ public class TakeMoneyZone : MonoBehaviour
     private IEnumerator CollectCoins()
     {
         _isCollecting = true;
+        _pendingCollect = true;
+
         int moneyToAdd = _totalMoney;
         _totalMoney = 0;
         _reservedCount = 0;
@@ -110,7 +127,24 @@ public class TakeMoneyZone : MonoBehaviour
 
         PlayerWallet.Instance?.Add(moneyToAdd);
         yield return new WaitForSeconds(collectFlyDuration);
+        _pendingCollect = false;
         _isCollecting = false;
+    }
+
+    private IEnumerator ShrinkAndDestroy(GameObject coin)
+    {
+        if (coin == null) yield break;
+        float duration = 0.15f;
+        float elapsed = 0f;
+        Vector3 startScale = coin.transform.localScale;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            if (coin == null) yield break;
+            coin.transform.localScale = Vector3.Lerp(startScale, Vector3.zero, elapsed / duration);
+            yield return null;
+        }
+        if (coin != null) Destroy(coin);
     }
 
     [SerializeField] private float collectStackSpacing = 0.15f;
@@ -140,7 +174,10 @@ public class TakeMoneyZone : MonoBehaviour
     {
         if (coin == null) yield break;
         yield return StartCoroutine(BounceScale(coin.transform));
-        _stack.Add(coin);
+        if (_pendingCollect)
+            StartCoroutine(ShrinkAndDestroy(coin));
+        else
+            _stack.Add(coin);
     }
 
     private IEnumerator BounceScale(Transform t)

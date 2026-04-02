@@ -1,0 +1,56 @@
+# =========================
+# Unity Generated Folders
+# =========================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+# =========================
+# Visual Studio / Rider
+# =========================
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# =========================
+# JetBrains Rider
+# =========================
+.idea/
+
+# =========================
+# OS Generated Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Crash / Cache
+# =========================
+sysinfo.txt
+
+# =========================
+# Addressables / ServerData
+# =========================
+ServerData/
+
+# =========================
+# IMPORTANT: meta files
+# =========================
+!/[Aa]ssets/**/*.meta
+!/[Pp]ackages/**/*.meta

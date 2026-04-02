@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerState _currentState;
     private bool _isMining;
+    private bool _forceIdle;
 
     private void Awake()
     {
@@ -77,6 +78,12 @@ public class PlayerController : MonoBehaviour
         _isMining = active;
     }
 
+    /// <summary>드릴 장착 시 IsWalking을 강제로 false로 유지합니다.</summary>
+    public void SetForceIdle(bool force)
+    {
+        _forceIdle = force;
+    }
+
     /// <summary>Mining 애니메이션 34프레임 Animation Event에서 호출됩니다.</summary>
     public void OnMiningHit()
     {
@@ -90,7 +97,7 @@ public class PlayerController : MonoBehaviour
     private void ApplyAnimator()
     {
         if (anim == null) return;
-        anim.SetBool("IsWalking", _currentState == PlayerState.Walk);
+        anim.SetBool("IsWalking", !_forceIdle && _currentState == PlayerState.Walk);
         anim.SetBool("IsMining",  _isMining);
     }
 

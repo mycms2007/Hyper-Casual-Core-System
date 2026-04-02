@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,9 +8,10 @@ using UnityEngine;
 /// </summary>
 public class HandcuffCarrier : MonoBehaviour
 {
-    [SerializeField] private Transform anchor;       // HandcuffAnchor
+    [SerializeField] private Transform anchor;
     [SerializeField] private float itemSpacing = 0.3f;
     [SerializeField] private Vector3 itemRotation = new Vector3(90f, 0f, 0f);
+    [SerializeField] private float expandDuration = 0.25f;
 
     private readonly List<GameObject> _handcuffs = new List<GameObject>();
 
@@ -24,6 +26,26 @@ public class HandcuffCarrier : MonoBehaviour
         obj.transform.localPosition = Vector3.up * (_handcuffs.Count * itemSpacing);
         obj.transform.localRotation = Quaternion.Euler(itemRotation);
         _handcuffs.Add(obj);
+
+        StartCoroutine(ExpandScale(obj.transform));
+    }
+
+    private IEnumerator ExpandScale(Transform t)
+    {
+        if (t == null) yield break;
+        Vector3 targetScale = t.localScale;
+        t.localScale = Vector3.zero;
+        float elapsed = 0f;
+        while (elapsed < expandDuration)
+        {
+            if (t == null) yield break;
+            elapsed += Time.deltaTime;
+            float p = Mathf.Clamp01(elapsed / expandDuration);
+            float s = 1f - Mathf.Exp(-7f * p) * Mathf.Cos(12f * p);
+            t.localScale = targetScale * s;
+            yield return null;
+        }
+        if (t != null) t.localScale = targetScale;
     }
 
     /// <summary>전체 수갑을 꺼내 반환하고 스택을 비운다. 언패런트 후 반환.</summary>

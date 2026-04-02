@@ -7,7 +7,7 @@ public class OreManager : MonoBehaviour
 
     [SerializeField] private Transform spawnPointsParent;
     [SerializeField] private float respawnDelay = 5f;
-    [SerializeField] private StackManager oreStackManager;
+    [SerializeField] private GemCarrier gemCarrier;
 
     private void Awake()
     {
@@ -16,9 +16,11 @@ public class OreManager : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log($"[OreManager] gemCarrier: {(gemCarrier != null ? "OK" : "NULL")}");
         Ore[] ores = spawnPointsParent.GetComponentsInChildren<Ore>();
+        Debug.Log($"[OreManager] Ore {ores.Length}개 초기화");
         foreach (Ore ore in ores)
-            ore.Init(ore.transform, oreStackManager);
+            ore.Init(ore.transform, gemCarrier);
     }
 
     public void ScheduleRespawn(Ore ore, Transform spawnPoint)
