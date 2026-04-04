@@ -37,6 +37,13 @@ public class DrillCar : MonoBehaviour
 
     public bool IsPurchased { get; private set; }
 
+    /// <summary>DrillCarUnlock(PurchaseZone activateTargets)에서 호출.</summary>
+    public void Purchase()
+    {
+        IsPurchased = true;
+        Debug.Log("[DrillCar] Purchase() — 드릴차 구매 완료");
+    }
+
     private bool _isDriving;
     private GameObject _player;
     private float _lastMineTime;
@@ -79,13 +86,18 @@ public class DrillCar : MonoBehaviour
         transform.SetParent(null);
         transform.position = position + spawnOffset;
 
-        // 카메라 방향 즉시 갱신 후 초기 회전 세팅 (백무빙 방지)
+        // 카메라 방향 즉시 갱신 (Update에서 사용)
         if (cam != null)
         {
             _camForward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
             _camRight   = Vector3.ProjectOnPlane(cam.transform.right,   Vector3.up).normalized;
         }
-        if (_camForward.sqrMagnitude > 0.01f)
+
+        // 초기 회전: 플레이어가 바라보는 방향으로 소환
+        Vector3 playerFwd = Vector3.ProjectOnPlane(player.transform.forward, Vector3.up).normalized;
+        if (playerFwd.sqrMagnitude > 0.01f)
+            transform.rotation = Quaternion.LookRotation(playerFwd) * Quaternion.Euler(0f, modelYaw, 0f);
+        else if (_camForward.sqrMagnitude > 0.01f)
             transform.rotation = Quaternion.LookRotation(-_camForward) * Quaternion.Euler(0f, modelYaw, 0f);
 
         Debug.Log($"[DrillCar] StartDrive ▶ cam={(cam != null ? cam.name : "NULL")}" +
@@ -100,6 +112,13 @@ public class DrillCar : MonoBehaviour
         _debugInputLogged = false;
         _isDriving = true;
 
+        // 캐리어 이전을 SetVisible(false) 전에 수행
+        // → SetVisible은 GetComponentsInChildren<Renderer>() 로 player 하위 렌더러를 전부 끄는데,
+        //   anchor가 아직 player 하위에 있으면 수갑/젬/돈 렌더러도 같이 꺼짐.
+        if (gemCarrier != null && gemAnchor != null) gemCarrier.AttachAnchorTo(gemAnchor);
+        if (moneyCarrier != null && moneyAnchor != null) moneyCarrier.AttachAnchorTo(moneyAnchor);
+        if (handcuffCarrier != null && handcuffAnchor != null) handcuffCarrier.AttachAnchorTo(handcuffAnchor);
+
         if (visual != null) visual.SetActive(true);
         if (playerController != null)
         {
@@ -107,10 +126,6 @@ public class DrillCar : MonoBehaviour
             playerController.SetVisible(false);
         }
         if (cameraFollow != null) cameraFollow.SetTarget(transform);
-
-        if (gemCarrier != null && gemAnchor != null) gemCarrier.AttachAnchorTo(gemAnchor);
-        if (moneyCarrier != null && moneyAnchor != null) moneyCarrier.AttachAnchorTo(moneyAnchor);
-        if (handcuffCarrier != null && handcuffAnchor != null) handcuffCarrier.AttachAnchorTo(handcuffAnchor);
     }
 
     private void Update()

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 /// <summary>
 /// Gem의 StackManager/StackItem과 완전히 독립된 수갑 전용 적재 시스템.
 /// 수갑을 HandcuffAnchor 하위에 부모-자식 구조로 쌓는다.
@@ -16,32 +17,32 @@ public class HandcuffCarrier : MonoBehaviour
     private readonly List<GameObject> _handcuffs = new List<GameObject>();
     private Transform _originalAnchorParent;
     private Vector3 _originalAnchorLocalPos;
+    private Vector3 _originalAnchorLocalScale;
+    private bool _isAttached;
+
+    // HandcuffStackZone에서 날아오는 중(아직 Add 전)인 수갑 수
+    private int _pendingCount;
+    public int TotalCount => _handcuffs.Count + _pendingCount;
+    public int PendingCount => _pendingCount;
+    public void ReservePending() => _pendingCount++;
+    public void CommitPending() { if (_pendingCount > 0) _pendingCount--; }
 
     public void AttachAnchorTo(Transform newParent)
     {
-        _originalAnchorParent = anchor.parent;
+        _originalAnchorParent   = anchor.parent;
         _originalAnchorLocalPos = anchor.localPosition;
+        _originalAnchorLocalScale = anchor.localScale;
+        _isAttached = true;
         anchor.SetParent(newParent, false);
         anchor.localPosition = Vector3.zero;
     }
 
     public void RestoreAnchor()
     {
-        if (_originalAnchorParent == null) return;
-        StartCoroutine(LerpAnchorBack());
-    }
-
-    private IEnumerator LerpAnchorBack()
-    {
-        anchor.SetParent(_originalAnchorParent, true);
-        Vector3 startLocal = anchor.localPosition;
-        float elapsed = 0f, duration = 0.4f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            anchor.localPosition = Vector3.Lerp(startLocal, _originalAnchorLocalPos, elapsed / duration);
-            yield return null;
-        }
+        if (!_isAttached) return;
+        _isAttached = false;
+        anchor.SetParent(_originalAnchorParent, false);
+        anchor.localScale    = _originalAnchorLocalScale;
         anchor.localPosition = _originalAnchorLocalPos;
         _originalAnchorParent = null;
     }
@@ -56,8 +57,16 @@ public class HandcuffCarrier : MonoBehaviour
         GameObject obj = Instantiate(prefab, anchor);
         obj.transform.localPosition = Vector3.up * (_handcuffs.Count * itemSpacing);
         obj.transform.localRotation = Quaternion.Euler(itemRotation);
-        _handcuffs.Add(obj);
 
+        // anchor의 worldScale이 1이 아닐 경우(DrillCar 모델 계층 오염 등)
+        // localScale을 역산해 worldScale이 항상 prefab 원본 크기가 되도록 보정.
+        // worldScale = anchor.lossyScale × localScale → localScale = prefabScale / anchor.lossyScale
+        Vector3 w = anchor.lossyScale;
+        Vector3 p = prefab.transform.localScale;
+        if (w.x != 0f && w.y != 0f && w.z != 0f)
+            obj.transform.localScale = new Vector3(p.x / w.x, p.y / w.y, p.z / w.z);
+
+        _handcuffs.Add(obj);
         StartCoroutine(ExpandScale(obj.transform));
     }
 

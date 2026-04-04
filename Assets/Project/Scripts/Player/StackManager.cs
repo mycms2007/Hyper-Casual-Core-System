@@ -17,11 +17,13 @@ public class StackManager : MonoBehaviour
 
     private Transform _originalRootParent;
     private Vector3 _originalRootLocalPos;
+    private Vector3 _originalRootLocalScale;
 
     public void AttachRootTo(Transform newParent)
     {
-        _originalRootParent = stackRoot.parent;
-        _originalRootLocalPos = stackRoot.localPosition;
+        _originalRootParent     = stackRoot.parent;
+        _originalRootLocalPos   = stackRoot.localPosition;
+        _originalRootLocalScale = stackRoot.localScale;
         stackRoot.SetParent(newParent, false);
         stackRoot.localPosition = Vector3.zero;
     }
@@ -31,6 +33,7 @@ public class StackManager : MonoBehaviour
         if (_originalRootParent == null) return;
         stackRoot.SetParent(_originalRootParent, false);
         stackRoot.localPosition = _originalRootLocalPos;
+        stackRoot.localScale    = _originalRootLocalScale;
         _originalRootParent = null;
     }
 

@@ -167,7 +167,7 @@ public class TakeMoneyZone : MonoBehaviour
             yield return null;
         }
 
-        if (coin != null) Destroy(coin);
+        if (coin != null) StartCoroutine(ShrinkAndDestroy(coin));
     }
 
     private IEnumerator LandCoin(GameObject coin)

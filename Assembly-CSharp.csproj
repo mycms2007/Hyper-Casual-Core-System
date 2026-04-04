@@ -70,6 +70,7 @@
     <Compile Include="Assets\Project\Scripts\Zone\HandcuffDropZone.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Examples\JoystickSetterExample.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\PurchaseZone.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\DrillCarUnlock.cs" />
     <Compile Include="Assets\Project\Scripts\UI\HUDManager.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\UI\KeyboardJoystickVisualizer.cs" />

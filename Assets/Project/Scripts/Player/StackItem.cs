@@ -28,7 +28,11 @@ public class StackItem : MonoBehaviour
 
         // 회전 — 타겟의 Y방향 기준 + sway + 아이템 고유 오프셋
         Quaternion baseRot = Quaternion.Euler(0f, _target.eulerAngles.y, 0f);
-        Quaternion swayRot = Quaternion.Euler(moveDir.z * _swayAmount, 0f, -moveDir.x * _swayAmount);
+
+        // moveDir(월드)를 플레이어 로컬 공간으로 변환해 sway 적용
+        // → 플레이어가 어느 방향을 보든 "앞으로 가면 뒤로 기울기"가 일관되게 동작
+        Vector3 localDir = Quaternion.Inverse(baseRot) * moveDir;
+        Quaternion swayRot = Quaternion.Euler(localDir.z * _swayAmount, 0f, -localDir.x * _swayAmount);
         Quaternion goalRot = baseRot * swayRot * Quaternion.Euler(_rotationOffset);
         transform.rotation = Quaternion.Slerp(transform.rotation, goalRot, _rotationSpeed * Time.deltaTime);
     }

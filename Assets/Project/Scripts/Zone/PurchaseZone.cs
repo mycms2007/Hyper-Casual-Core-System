@@ -7,7 +7,10 @@ public enum ActivationTrigger { None, Prerequisite, FirstMoney, JailFull }
 /// <summary>
 /// 플레이어가 holdDuration 동안 서있으면 구매되는 존.
 /// 활성화 조건: None(즉시), Prerequisite(선행존), FirstMoney(첫 돈 수령), JailFull(감옥 20명)
-/// 활성화 시 스프링 등장, 구매 시 역스프링 퇴장.
+///
+/// zoneVisual이 연결되어 있으면 해당 오브젝트를 스프링 애니메이션 타겟으로 사용.
+/// 연결되어 있지 않으면 이 GameObject 자신의 transform을 타겟으로 자동 사용.
+/// → 어떤 존이든 인스펙터 추가 연결 없이 스프링 등장/퇴장 동작.
 /// </summary>
 public class PurchaseZone : MonoBehaviour
 {
@@ -18,14 +21,14 @@ public class PurchaseZone : MonoBehaviour
 
     [Header("활성화 조건")]
     [SerializeField] private ActivationTrigger trigger = ActivationTrigger.None;
-    [SerializeField] private PurchaseZone prerequisite; // Prerequisite일 때만 사용
+    [SerializeField] private PurchaseZone prerequisite;
 
-    [Header("연출")]
-    [SerializeField] private GameObject zoneVisual;
+    [Header("연출 (선택)")]
+    [SerializeField] private GameObject zoneVisual; // null이면 self 애니메이션
     [SerializeField] private GameObject[] activateTargets;
     [SerializeField] private Image fillImage;
 
-    [Header("구매 후 지연 활성화")]
+    [Header("구매 후 지연 활성화 (선택)")]
     [SerializeField] private GameObject[] delayedActivateTargets;
     [SerializeField] private float delayedActivateDelay = 0f;
 
@@ -33,6 +36,10 @@ public class PurchaseZone : MonoBehaviour
     private bool _ready;
     private bool _isHolding;
     private float _holdProgress;
+
+    private Transform _visualTarget;  // 애니메이션 타겟 (zoneVisual 또는 self)
+    private bool _usingSelf;          // true면 self 애니메이션 — SetActive 대신 scale 0 유지
+    private Vector3 _originalScale;   // 씬에서 설정된 원래 localScale
 
     public bool IsPurchased => _purchased;
 
@@ -53,7 +60,18 @@ public class PurchaseZone : MonoBehaviour
     private void Start()
     {
         if (zoneVisual != null)
-            zoneVisual.transform.localScale = Vector3.zero;
+        {
+            _visualTarget = zoneVisual.transform;
+            _usingSelf = false;
+        }
+        else
+        {
+            _visualTarget = transform;
+            _usingSelf = true;
+        }
+
+        _originalScale = _visualTarget.localScale;  // 제로 세팅 전에 원래 크기 저장
+        _visualTarget.localScale = Vector3.zero;
         if (fillImage != null) fillImage.fillAmount = 0f;
 
         if (trigger == ActivationTrigger.None)
@@ -88,7 +106,6 @@ public class PurchaseZone : MonoBehaviour
 
     private void OnTriggerConditionMet()
     {
-        Debug.Log($"[PurchaseZone] {gameObject.name} — OnTriggerConditionMet 호출됨 (ready={_ready}, purchased={_purchased})");
         if (_ready || _purchased) return;
 
         if (purchaseCooldown > 0f)
@@ -100,26 +117,18 @@ public class PurchaseZone : MonoBehaviour
     private void BecomeReady()
     {
         _ready = true;
-        Debug.Log($"[PurchaseZone] {gameObject.name} — BecomeReady 호출됨 (zoneVisual={zoneVisual})");
 
-        if (zoneVisual != null)
-        {
-            zoneVisual.SetActive(true);
-            StartCoroutine(SpringAppear(zoneVisual.transform));
-        }
-        else
-        {
-            Debug.LogWarning($"[PurchaseZone] {gameObject.name} — zoneVisual이 null입니다! 인스펙터에서 연결을 확인하세요.");
-        }
+        if (!_usingSelf)
+            _visualTarget.gameObject.SetActive(true);
+
+        StartCoroutine(SpringAppear(_visualTarget));
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"[PurchaseZone] {gameObject.name} OnTriggerEnter — purchased={_purchased}, ready={_ready}, collider={other.name}");
         if (_purchased || !_ready) return;
         if (other.GetComponentInParent<PlayerController>() == null) return;
 
-        Debug.Log($"[PurchaseZone] {gameObject.name} — 플레이어 감지, 구매 시작");
         _isHolding = true;
         _holdProgress = 1f;
         if (fillImage != null) fillImage.fillAmount = 1f;
@@ -146,17 +155,23 @@ public class PurchaseZone : MonoBehaviour
         if (delayedActivateTargets != null && delayedActivateTargets.Length > 0)
             StartCoroutine(DelayedActivate());
 
-
-        // 존 오브젝트 및 자식의 렌더러 숨김
-        foreach (Renderer r in GetComponentsInChildren<Renderer>())
-            r.enabled = false;
-
-        // Canvas UI 숨김
-        foreach (Canvas c in GetComponentsInChildren<Canvas>())
-            c.gameObject.SetActive(false);
-
-        if (zoneVisual != null)
-            StartCoroutine(SpringDisappear(zoneVisual.transform, () => zoneVisual.SetActive(false)));
+        // 퇴장 애니메이션 후 시각 요소 정리
+        if (!_usingSelf)
+        {
+            // zoneVisual을 제외한 나머지(존 플랫폼/UI)만 즉시 숨기고, visual은 애니메이션 후 숨김
+            foreach (Renderer r in GetComponentsInChildren<Renderer>())
+                if (!r.transform.IsChildOf(_visualTarget) && r.transform != _visualTarget)
+                    r.enabled = false;
+            foreach (Canvas c in GetComponentsInChildren<Canvas>())
+                if (!c.transform.IsChildOf(_visualTarget) && c.transform != _visualTarget)
+                    c.gameObject.SetActive(false);
+            StartCoroutine(SpringDisappear(_visualTarget, () => _visualTarget.gameObject.SetActive(false)));
+        }
+        else
+        {
+            // self 모드: 애니메이션 자체가 시각 정리 — scale 0이 되면 충분
+            StartCoroutine(SpringDisappear(_visualTarget, null));
+        }
     }
 
     private IEnumerator DelayedActivate()
@@ -174,10 +189,10 @@ public class PurchaseZone : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float p = Mathf.Clamp01(elapsed / duration);
-            t.localScale = Vector3.one * SpringEaseOut(p);
+            t.localScale = _originalScale * Mathf.Clamp(SpringEaseOut(p), 0f, 1f);
             yield return null;
         }
-        t.localScale = Vector3.one;
+        t.localScale = _originalScale;
     }
 
     private IEnumerator SpringDisappear(Transform t, System.Action onDone)
@@ -191,7 +206,7 @@ public class PurchaseZone : MonoBehaviour
             float s = p < 0.25f
                 ? Mathf.Lerp(1f, 1.12f, p / 0.25f)
                 : Mathf.Lerp(1.12f, 0f, (p - 0.25f) / 0.75f);
-            t.localScale = Vector3.one * s;
+            t.localScale = _originalScale * s;
             yield return null;
         }
         t.localScale = Vector3.zero;

@@ -107,14 +107,18 @@ public class HandcuffStackZone : Zone
     {
         int originalCount = _stackedHandcuffs.Count;
 
+        // 전체를 미리 예약 — OfficeZone이 TotalCount로 in-flight 수갑까지 파악 가능
+        for (int i = 0; i < originalCount; i++) carrier.ReservePending();
+
         for (int i = originalCount - 1; i >= 0; i--)
         {
             GameObject handcuff = _stackedHandcuffs[i];
-            if (handcuff == null) continue;
+            if (handcuff == null) { carrier.CommitPending(); continue; }
 
             yield return StartCoroutine(FlyHandcuff(handcuff));
             Destroy(handcuff);
             carrier.Add(handcuffPrefab);
+            carrier.CommitPending();
 
             yield return new WaitForSeconds(pickupInterval);
         }

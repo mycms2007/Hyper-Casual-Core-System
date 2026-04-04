@@ -14,7 +14,9 @@ public class HandcuffDropZone : MonoBehaviour
     [SerializeField] private float bounceDuration = 0.25f;
 
     private readonly List<GameObject> _stack = new List<GameObject>();
+    private readonly Queue<List<GameObject>> _receiveQueue = new Queue<List<GameObject>>();
     private bool _isReceiving;
+    private int _reservedCount;  // 착지 포함 in-flight 슬롯 예약 수
 
     private void Awake()
     {
@@ -31,28 +33,32 @@ public class HandcuffDropZone : MonoBehaviour
 
     public void Receive(List<GameObject> handcuffs)
     {
-        if (_isReceiving || handcuffs == null || handcuffs.Count == 0) return;
-        StartCoroutine(ReceiveSequence(handcuffs));
+        if (handcuffs == null || handcuffs.Count == 0) return;
+        _receiveQueue.Enqueue(new List<GameObject>(handcuffs));
+        if (!_isReceiving) StartCoroutine(ProcessQueue());
+    }
+
+    private IEnumerator ProcessQueue()
+    {
+        _isReceiving = true;
+        while (_receiveQueue.Count > 0)
+            yield return StartCoroutine(ReceiveSequence(_receiveQueue.Dequeue()));
+        _isReceiving = false;
     }
 
     private IEnumerator ReceiveSequence(List<GameObject> handcuffs)
     {
-        _isReceiving = true;
-        int baseIndex = _stack.Count;
-
         for (int i = handcuffs.Count - 1; i >= 0; i--)
         {
             GameObject handcuff = handcuffs[i];
             if (handcuff == null) continue;
 
-            int stackIndex = _stack.Count;
-            Vector3 target = GetStackPosition(baseIndex + (handcuffs.Count - 1 - i));
+            int slot = _reservedCount++;  // null 아닌 것만 슬롯 소비
+            Vector3 target = GetStackPosition(slot);
             StartCoroutine(FlyAndLand(handcuff, target, () => _stack.Add(handcuff)));
 
             yield return new WaitForSeconds(dropInterval);
         }
-
-        _isReceiving = false;
     }
 
     private IEnumerator FlyAndLand(GameObject handcuff, Vector3 target, System.Action onLanded = null)
@@ -107,6 +113,7 @@ public class HandcuffDropZone : MonoBehaviour
         int last = _stack.Count - 1;
         GameObject top = _stack[last];
         _stack.RemoveAt(last);
+        if (_reservedCount > 0) _reservedCount--;
         return top;
     }
 }
