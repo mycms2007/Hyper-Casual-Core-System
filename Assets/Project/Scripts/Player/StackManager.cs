@@ -15,6 +15,25 @@ public class StackManager : MonoBehaviour
 
     public int Count => _stack.Count;
 
+    private Transform _originalRootParent;
+    private Vector3 _originalRootLocalPos;
+
+    public void AttachRootTo(Transform newParent)
+    {
+        _originalRootParent = stackRoot.parent;
+        _originalRootLocalPos = stackRoot.localPosition;
+        stackRoot.SetParent(newParent, false);
+        stackRoot.localPosition = Vector3.zero;
+    }
+
+    public void DetachRoot()
+    {
+        if (_originalRootParent == null) return;
+        stackRoot.SetParent(_originalRootParent, false);
+        stackRoot.localPosition = _originalRootLocalPos;
+        _originalRootParent = null;
+    }
+
     private void Awake()
     {
         if (stackRoot == null)

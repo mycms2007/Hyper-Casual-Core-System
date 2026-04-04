@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Arrested\ArrestedPerson.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\HandcuffStackZone.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\MinerWorker.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\PrisonerPath.cs" />
     <Compile Include="Assets\Project\Scripts\Player\AlbaController.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\MiningTrigger.cs" />

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum PlayerState { Idle, Walk }
@@ -18,10 +19,13 @@ public class PlayerController : MonoBehaviour
     private PlayerState _currentState;
     private bool _isMining;
     private bool _forceIdle;
+    private bool _movementLocked;
+    private Vector3 _originalScale;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        _originalScale = transform.localScale;
 
         if (cam == null) cam = Camera.main;
         _camForward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
@@ -32,6 +36,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.F5) && DrillCar.Instance != null && !DrillCar.Instance.IsPurchased)
+            DrillCar.Instance.DebugInstantPurchase();
+#endif
+
+        if (_movementLocked) return;
+
         switch (_currentState)
         {
             case PlayerState.Idle: UpdateIdle(); break;
@@ -43,6 +54,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_movementLocked) return;
+
         Vector2 input = GetMoveInput();
         Move(input);
         Rotate(input);
@@ -82,6 +95,45 @@ public class PlayerController : MonoBehaviour
     public void SetForceIdle(bool force)
     {
         _forceIdle = force;
+    }
+
+    /// <summary>DrillCar 탑승 시 이동 잠금.</summary>
+    public void SetMovementLocked(bool locked)
+    {
+        _movementLocked = locked;
+    }
+
+    /// <summary>DrillCar 탑승 시 플레이어 렌더러 숨김/표시.</summary>
+    public void SetVisible(bool visible)
+    {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+            r.enabled = visible;
+    }
+
+    /// <summary>DrillCar 하차 시 지정 위치로 복귀 + 스케일 스프링 복원.</summary>
+    public void BeginRestore(Vector3 worldPosition)
+    {
+        StartCoroutine(RestoreCoroutine(worldPosition));
+    }
+
+    private IEnumerator RestoreCoroutine(Vector3 worldPosition)
+    {
+        transform.position = worldPosition;
+        float elapsed = 0f;
+        float duration = 0.3f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float p = Mathf.Clamp01(elapsed / duration);
+            float s = 1f - Mathf.Exp(-7f * p) * Mathf.Cos(12f * p);
+            transform.localScale = _originalScale * s;
+            yield return null;
+        }
+        transform.localScale = _originalScale;
+        _movementLocked = false;
+        _forceIdle = false;
+        ChangeState(PlayerState.Idle);
+        ApplyAnimator();
     }
 
     /// <summary>Mining 애니메이션 34프레임 Animation Event에서 호출됩니다.</summary>

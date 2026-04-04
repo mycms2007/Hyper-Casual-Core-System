@@ -25,6 +25,10 @@ public class PurchaseZone : MonoBehaviour
     [SerializeField] private GameObject[] activateTargets;
     [SerializeField] private Image fillImage;
 
+    [Header("구매 후 지연 활성화")]
+    [SerializeField] private GameObject[] delayedActivateTargets;
+    [SerializeField] private float delayedActivateDelay = 0f;
+
     private bool _purchased;
     private bool _ready;
     private bool _isHolding;
@@ -139,6 +143,10 @@ public class PurchaseZone : MonoBehaviour
         foreach (GameObject target in activateTargets)
             if (target != null) target.SetActive(true);
 
+        if (delayedActivateTargets != null && delayedActivateTargets.Length > 0)
+            StartCoroutine(DelayedActivate());
+
+
         // 존 오브젝트 및 자식의 렌더러 숨김
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
             r.enabled = false;
@@ -149,6 +157,13 @@ public class PurchaseZone : MonoBehaviour
 
         if (zoneVisual != null)
             StartCoroutine(SpringDisappear(zoneVisual.transform, () => zoneVisual.SetActive(false)));
+    }
+
+    private IEnumerator DelayedActivate()
+    {
+        yield return new WaitForSeconds(delayedActivateDelay);
+        foreach (GameObject target in delayedActivateTargets)
+            if (target != null) target.SetActive(true);
     }
 
     private IEnumerator SpringAppear(Transform t)

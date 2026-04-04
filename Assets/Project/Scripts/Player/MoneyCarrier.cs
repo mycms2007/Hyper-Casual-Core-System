@@ -21,6 +21,9 @@ public class MoneyCarrier : MonoBehaviour
             stackManager.TryAdd(coinPrefab);
     }
 
+    public void AttachAnchorTo(Transform newParent) => stackManager.AttachRootTo(newParent);
+    public void RestoreAnchor() => stackManager.DetachRoot();
+
     public void SpendMoney(int remainingMoney)
     {
         int target = remainingMoney / wonPerCoin;

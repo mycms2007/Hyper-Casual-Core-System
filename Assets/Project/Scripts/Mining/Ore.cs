@@ -11,7 +11,12 @@ public class Ore : MonoBehaviour
     private MeshRenderer _mesh;
     private Transform _spawnPoint;
     private bool _isDead;
+    private bool _isClaimed;
     public bool IsDead => _isDead;
+    public bool IsClaimed => _isClaimed;
+
+    public void Claim()   => _isClaimed = true;
+    public void Unclaim() => _isClaimed = false;
 
     public void Init(Transform spawnPoint, GemCarrier gemCarrier)
     {
@@ -48,6 +53,7 @@ public class Ore : MonoBehaviour
     public void Respawn()
     {
         _isDead = false;
+        _isClaimed = false;
         _currentHp = maxHp;
         _mesh.enabled = true;
     }

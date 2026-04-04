@@ -8,11 +8,10 @@ public class DrillSurface : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"[DrillSurface] OnTriggerEnter — {other.name}");
         Ore ore = other.GetComponent<Ore>();
         if (ore == null || ore.IsDead) return;
 
         while (!ore.IsDead) ore.TakeDamage();
-
-        DrillCar.Instance?.OnOreMined();
     }
 }

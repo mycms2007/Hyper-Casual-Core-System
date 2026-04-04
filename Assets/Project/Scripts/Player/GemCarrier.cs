@@ -22,4 +22,7 @@ public class GemCarrier : MonoBehaviour
     }
 
     public int Count => stackManager.Count;
+
+    public void AttachAnchorTo(Transform newParent) => stackManager.AttachRootTo(newParent);
+    public void RestoreAnchor() => stackManager.DetachRoot();
 }

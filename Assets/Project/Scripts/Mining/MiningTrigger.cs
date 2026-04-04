@@ -32,14 +32,10 @@ public class MiningTrigger : MonoBehaviour
         _oresInRange.Add(ore);
 
         // 드릴차 구매 완료 → 드릴차 발진
-        Debug.Log($"[MiningTrigger] 광물 감지 — IsDrillCarPurchased={IsDrillCarPurchased}, _drillPurchased={_drillPurchased}");
+        Debug.Log($"[MiningTrigger] 광물 감지 — Instance={DrillCar.Instance != null}, IsPurchased={DrillCar.Instance?.IsPurchased}, _drillPurchased={_drillPurchased}");
         if (IsDrillCarPurchased)
         {
-            DrillCar.Instance.StartDrive(
-                transform.position,
-                player.transform.forward,
-                player.gameObject
-            );
+            DrillCar.Instance.StartDrive(player.transform.position, player.gameObject);
             return;
         }
 
@@ -121,6 +117,7 @@ public class MiningTrigger : MonoBehaviour
         _isMining = false;
         if (player != null && !IsDrillEquipped) player.SetMiningActive(false);
         if (drillObject != null) drillObject.SetActive(false);
+        if (player != null) player.SetForceIdle(false);
         _miningOffCoroutine = null;
     }
 

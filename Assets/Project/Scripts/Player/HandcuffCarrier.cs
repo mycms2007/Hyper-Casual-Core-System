@@ -14,6 +14,37 @@ public class HandcuffCarrier : MonoBehaviour
     [SerializeField] private float expandDuration = 0.25f;
 
     private readonly List<GameObject> _handcuffs = new List<GameObject>();
+    private Transform _originalAnchorParent;
+    private Vector3 _originalAnchorLocalPos;
+
+    public void AttachAnchorTo(Transform newParent)
+    {
+        _originalAnchorParent = anchor.parent;
+        _originalAnchorLocalPos = anchor.localPosition;
+        anchor.SetParent(newParent, false);
+        anchor.localPosition = Vector3.zero;
+    }
+
+    public void RestoreAnchor()
+    {
+        if (_originalAnchorParent == null) return;
+        StartCoroutine(LerpAnchorBack());
+    }
+
+    private IEnumerator LerpAnchorBack()
+    {
+        anchor.SetParent(_originalAnchorParent, true);
+        Vector3 startLocal = anchor.localPosition;
+        float elapsed = 0f, duration = 0.4f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            anchor.localPosition = Vector3.Lerp(startLocal, _originalAnchorLocalPos, elapsed / duration);
+            yield return null;
+        }
+        anchor.localPosition = _originalAnchorLocalPos;
+        _originalAnchorParent = null;
+    }
 
     public int Count => _handcuffs.Count;
 
