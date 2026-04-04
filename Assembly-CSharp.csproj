@@ -84,6 +84,7 @@
     <Compile Include="Assets\Project\Scripts\UI\FaceCamera.cs" />
     <Compile Include="Assets\Project\Scripts\Player\HandcuffCarrier.cs" />
     <Compile Include="Assets\Project\Scripts\Player\PlayerController.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\MinerSpawner.cs" />
     <Compile Include="Assets\Project\Scripts\Player\GemCarrier.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\TakeMoneyZone.cs" />
