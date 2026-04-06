@@ -24,7 +24,8 @@ public class MinerSpawner : MonoBehaviour
         foreach (Transform point in spawnPoints)
         {
             if (point == null) continue;
-            Instantiate(minerPrefab, point.position, point.rotation);
+            GameObject miner = Instantiate(minerPrefab, point.position, point.rotation);
+            miner.transform.SetParent(null); // 월드 루트로 분리
         }
     }
 }

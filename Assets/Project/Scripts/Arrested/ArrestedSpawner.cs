@@ -5,7 +5,6 @@ using UnityEngine;
 public class ArrestedSpawner : MonoBehaviour
 {
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private Transform destination;          // HandcuffReceiveZone 위치
     [SerializeField] private HandcuffReceiveZone receiveZone;
     [SerializeField] private GameObject[] arrestedPrefabs;   // Arrested1, 2, 3
     [SerializeField] private int maxCount = 5;
@@ -46,7 +45,8 @@ public class ArrestedSpawner : MonoBehaviour
 
         person.PersonAhead = _queue.Count > 0 ? _queue[_queue.Count - 1] : null;
         person.GapDistance = gapDistance;
-        person.Initialize(destination, receiveZone, jailDestination, takeMoneyZone);
+        person.Initialize(receiveZone, jailDestination, takeMoneyZone);
+        person.SetWaypoints(ArrestedPath.Instance != null ? ArrestedPath.Instance.Waypoints : null);
         person.OnTransformed += OnPersonTransformed;
 
         _queue.Add(person);

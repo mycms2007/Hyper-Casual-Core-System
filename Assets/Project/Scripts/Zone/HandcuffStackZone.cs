@@ -14,17 +14,19 @@ public class HandcuffStackZone : Zone
     [SerializeField] private Vector3 handcuffSpawnRotation = new Vector3(90f, 0f, 0f);
 
     [Header("픽업 설정")]
-    [SerializeField] private HandcuffCarrier carrier;   // Gem StackManager와 완전 분리
+    [SerializeField] private HandcuffCarrier carrier;
     [SerializeField] private Transform playerAnchor;
     [SerializeField] private float flyDuration = 0.4f;
     [SerializeField] private float pickupInterval = 0.08f;
 
-    private List<GameObject> _stackedHandcuffs = new List<GameObject>();
-    private bool _isTransferring;
-
     [Header("낙하 연출")]
     [SerializeField] private float dropDuration = 0.35f;
     [SerializeField] private AnimationCurve landBounceCurve;
+
+    private List<GameObject> _stackedHandcuffs = new List<GameObject>();
+    private bool _isTransferring;
+
+    public int StackCount => _stackedHandcuffs.Count;
 
     private void Awake()
     {
@@ -90,6 +92,8 @@ public class HandcuffStackZone : Zone
         return transform.position + stackBaseOffset + new Vector3(0f, index * ySpacing, 0f);
     }
 
+    // ── 플레이어 픽업 ──────────────────────────────────────────────
+
     protected override void OnPlayerEnter(PlayerController player) => TryTransfer();
     protected override void OnPlayerStay(PlayerController player) => TryTransfer();
 
@@ -98,6 +102,7 @@ public class HandcuffStackZone : Zone
         if (_isTransferring) return;
         if (_stackedHandcuffs.Count == 0) return;
         if (carrier == null || playerAnchor == null) return;
+        if (AlbaController.IsHired) return;
 
         _isTransferring = true;
         StartCoroutine(TransferToPlayer());
@@ -107,7 +112,6 @@ public class HandcuffStackZone : Zone
     {
         int originalCount = _stackedHandcuffs.Count;
 
-        // 전체를 미리 예약 — OfficeZone이 TotalCount로 in-flight 수갑까지 파악 가능
         for (int i = 0; i < originalCount; i++) carrier.ReservePending();
 
         for (int i = originalCount - 1; i >= 0; i--)
@@ -115,7 +119,7 @@ public class HandcuffStackZone : Zone
             GameObject handcuff = _stackedHandcuffs[i];
             if (handcuff == null) { carrier.CommitPending(); continue; }
 
-            yield return StartCoroutine(FlyHandcuff(handcuff));
+            yield return StartCoroutine(FlyHandcuff(handcuff, playerAnchor));
             Destroy(handcuff);
             carrier.Add(handcuffPrefab);
             carrier.CommitPending();
@@ -123,7 +127,6 @@ public class HandcuffStackZone : Zone
             yield return new WaitForSeconds(pickupInterval);
         }
 
-        // 루프 도중 SpawnSequence가 추가한 수갑들 → 1층으로 낙하
         List<GameObject> excess = new List<GameObject>();
         for (int i = originalCount; i < _stackedHandcuffs.Count; i++)
             if (_stackedHandcuffs[i] != null) excess.Add(_stackedHandcuffs[i]);
@@ -137,6 +140,74 @@ public class HandcuffStackZone : Zone
         }
 
         _isTransferring = false;
+    }
+
+    // ── 알바 픽업 ──────────────────────────────────────────────────
+
+    public void TryTransferToAlba(HandcuffCarrier albaCarrier, Transform albaAnchor)
+    {
+        if (_isTransferring) return;
+        if (_stackedHandcuffs.Count == 0) return;
+        if (albaCarrier == null || albaAnchor == null) return;
+
+        _isTransferring = true;
+        StartCoroutine(TransferToAlba(albaCarrier, albaAnchor));
+    }
+
+    private IEnumerator TransferToAlba(HandcuffCarrier albaCarrier, Transform albaAnchor)
+    {
+        int originalCount = _stackedHandcuffs.Count;
+
+        for (int i = 0; i < originalCount; i++) albaCarrier.ReservePending();
+
+        for (int i = originalCount - 1; i >= 0; i--)
+        {
+            GameObject handcuff = _stackedHandcuffs[i];
+            if (handcuff == null) { albaCarrier.CommitPending(); continue; }
+
+            yield return StartCoroutine(FlyHandcuff(handcuff, albaAnchor));
+            Destroy(handcuff);
+            albaCarrier.Add(handcuffPrefab);
+            albaCarrier.CommitPending();
+
+            yield return new WaitForSeconds(pickupInterval);
+        }
+
+        List<GameObject> excess = new List<GameObject>();
+        for (int i = originalCount; i < _stackedHandcuffs.Count; i++)
+            if (_stackedHandcuffs[i] != null) excess.Add(_stackedHandcuffs[i]);
+
+        _stackedHandcuffs.Clear();
+
+        for (int i = 0; i < excess.Count; i++)
+        {
+            _stackedHandcuffs.Add(excess[i]);
+            StartCoroutine(DropToFloor(excess[i].transform, GetStackPosition(i)));
+        }
+
+        _isTransferring = false;
+    }
+
+    // ── 공통 연출 ──────────────────────────────────────────────────
+
+    private IEnumerator FlyHandcuff(GameObject handcuff, Transform target)
+    {
+        Vector3 start = handcuff.transform.position;
+        float elapsed = 0f;
+
+        while (elapsed < flyDuration)
+        {
+            if (handcuff == null) yield break;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / flyDuration);
+            Vector3 pos = Vector3.Lerp(start, target.position, t);
+            pos.y += Mathf.Sin(t * Mathf.PI) * 1.0f;
+            handcuff.transform.position = pos;
+            yield return null;
+        }
+
+        if (handcuff == null) yield break;
+        handcuff.transform.position = target.position;
     }
 
     private IEnumerator DropToFloor(Transform t, Vector3 target)
@@ -177,25 +248,5 @@ public class HandcuffStackZone : Zone
         }
 
         if (t != null) t.localScale = baseScale;
-    }
-
-    private IEnumerator FlyHandcuff(GameObject handcuff)
-    {
-        Vector3 start = handcuff.transform.position;
-        float elapsed = 0f;
-
-        while (elapsed < flyDuration)
-        {
-            if (handcuff == null) yield break;
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / flyDuration);
-            Vector3 pos = Vector3.Lerp(start, playerAnchor.position, t);
-            pos.y += Mathf.Sin(t * Mathf.PI) * 1.0f;
-            handcuff.transform.position = pos;
-            yield return null;
-        }
-
-        if (handcuff == null) yield break;
-        handcuff.transform.position = playerAnchor.position;
     }
 }

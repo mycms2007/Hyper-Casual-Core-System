@@ -176,9 +176,17 @@ public class PurchaseZone : MonoBehaviour
 
     private IEnumerator DelayedActivate()
     {
+        Debug.Log($"[PurchaseZone] DelayedActivate 시작 — {delayedActivateDelay}초 대기");
         yield return new WaitForSeconds(delayedActivateDelay);
+        Debug.Log($"[PurchaseZone] DelayedActivate 발동 — 대상 {delayedActivateTargets.Length}개");
         foreach (GameObject target in delayedActivateTargets)
-            if (target != null) target.SetActive(true);
+        {
+            if (target != null)
+            {
+                Debug.Log($"[PurchaseZone] SetActive(true) → {target.name}");
+                target.SetActive(true);
+            }
+        }
     }
 
     private IEnumerator SpringAppear(Transform t)

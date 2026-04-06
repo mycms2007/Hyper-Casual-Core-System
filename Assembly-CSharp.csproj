@@ -75,9 +75,11 @@
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\UI\KeyboardJoystickVisualizer.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\HandcuffReceiveZone.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\AlbaSpawner.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\OfficeManager.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\GemDropZone.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\JailZone.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\MinerAnimEvent.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CameraFollow.cs" />
     <Compile Include="Assets\Project\Scripts\Player\MoneyCarrier.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\ItemTransZone.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Assets\Project\Scripts\UI\FaceCamera.cs" />
     <Compile Include="Assets\Project\Scripts\Player\HandcuffCarrier.cs" />
     <Compile Include="Assets\Project\Scripts\Player\PlayerController.cs" />
+    <Compile Include="Assets\Project\Scripts\Arrested\ArrestedPath.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\MinerSpawner.cs" />
     <Compile Include="Assets\Project\Scripts\Player\GemCarrier.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
@@ -105,6 +108,7 @@
     <Compile Include="Assets\Project\Scripts\Arrested\ArrestedSpawner.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\DrillCar.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\ArrowAnimation.cs" />
+    <Compile Include="Assets\Project\Scripts\Zone\MinerUpZone.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\JailCheckpoint.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\OfficeZone.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Examples\JoystickPlayerExample.cs" />

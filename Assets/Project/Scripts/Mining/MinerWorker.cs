@@ -23,7 +23,6 @@ public class MinerWorker : MonoBehaviour
     [SerializeField] private float arrivalDistance = 0.8f;
 
     [Header("채굴")]
-    [SerializeField] private float mineInterval = 0.5f;
     [SerializeField] private float mineRange = 1.2f;
 
     [Header("광석 선택")]
@@ -39,7 +38,6 @@ public class MinerWorker : MonoBehaviour
     private Animator _anim;
     private State _state;
     private Ore _targetOre;
-    private float _nextMineTime;
     private float _pauseEndTime;
 
     private void Awake()
@@ -110,7 +108,7 @@ public class MinerWorker : MonoBehaviour
         if (_targetOre == null || _targetOre.IsDead)
         {
             ReleaseTarget();
-            EnterPause(); // 뺏김 처리
+            EnterPause();
             return;
         }
 
@@ -120,12 +118,13 @@ public class MinerWorker : MonoBehaviour
             EnterMoveToOre();
             return;
         }
+    }
 
-        if (Time.time >= _nextMineTime)
-        {
-            _nextMineTime = Time.time + mineInterval;
-            _targetOre.TakeDamage();
-        }
+    // 애니메이션 이벤트 → MinerAnimEvent.cs 에서 호출
+    public void OnMiningHit()
+    {
+        if (_state != State.Mining) return;
+        _targetOre?.TakeDamage();
     }
 
     private void UpdatePause()
@@ -215,7 +214,6 @@ public class MinerWorker : MonoBehaviour
     private void EnterMining()
     {
         _state = State.Mining;
-        _nextMineTime = Time.time + mineInterval;
         SetAnimation(walking: false, mining: true);
         FaceTarget(_targetOre.transform.position);
     }

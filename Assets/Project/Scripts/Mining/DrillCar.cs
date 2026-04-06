@@ -50,6 +50,7 @@ public class DrillCar : MonoBehaviour
     private float _playerOriginalY;
     private Vector3 _camForward;
     private Vector3 _camRight;
+    private Vector3 _lastDriveDir;  // 마지막 이동 방향 — EndDrive 시 플레이어 회전 복원용
 
     private void Awake()
     {
@@ -93,10 +94,11 @@ public class DrillCar : MonoBehaviour
             _camRight   = Vector3.ProjectOnPlane(cam.transform.right,   Vector3.up).normalized;
         }
 
-        // 초기 회전: 플레이어가 바라보는 방향으로 소환
+        // 초기 회전: 플레이어가 바라보는 방향에 맞춰 소환
+        // DrillCar.Rotate()는 LookRotation(-dir)*modelYaw 공식을 쓰므로 여기도 동일하게 적용
         Vector3 playerFwd = Vector3.ProjectOnPlane(player.transform.forward, Vector3.up).normalized;
         if (playerFwd.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.LookRotation(playerFwd) * Quaternion.Euler(0f, modelYaw, 0f);
+            transform.rotation = Quaternion.LookRotation(-playerFwd) * Quaternion.Euler(0f, modelYaw, 0f);
         else if (_camForward.sqrMagnitude > 0.01f)
             transform.rotation = Quaternion.LookRotation(-_camForward) * Quaternion.Euler(0f, modelYaw, 0f);
 
@@ -110,6 +112,7 @@ public class DrillCar : MonoBehaviour
         _playerOriginalY = player.transform.position.y;
         _lastMineTime = Time.time;
         _debugInputLogged = false;
+        _lastDriveDir = Vector3.zero;
         _isDriving = true;
 
         // 캐리어 이전을 SetVisible(false) 전에 수행
@@ -187,6 +190,7 @@ public class DrillCar : MonoBehaviour
     {
         if (input.sqrMagnitude < 0.01f) return;
         Vector3 dir = (_camForward * input.y + _camRight * input.x).normalized;
+        _lastDriveDir = dir;
         transform.position += dir * moveSpeed * Time.deltaTime;
     }
 
@@ -214,6 +218,12 @@ public class DrillCar : MonoBehaviour
                       $"\n  StartDrive 이후 경과={Time.time - _lastMineTime:F3}s (idleTimeout={idleTimeout})" +
                       $"\n  → 입력 로그가 찍혔나요? [{(_debugInputLogged ? "YES - 실제 이동 문제" : "NO - 너무 빨리 종료됨")}]");
             _player.transform.position = restorePos;
+
+            // PlayerController 재활성화 전에 rotation을 마지막 드라이브 방향으로 맞춤
+            // → PlayerController.Rotate()가 LookRotation(dir)을 쓰므로 이미 맞춰져 있으면 스핀 없음
+            if (_lastDriveDir.sqrMagnitude > 0.01f)
+                _player.transform.rotation = Quaternion.LookRotation(_lastDriveDir);
+
             if (playerController != null)
             {
                 playerController.SetVisible(true);

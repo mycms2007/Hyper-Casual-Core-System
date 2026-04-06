@@ -12,9 +12,8 @@ public class ArrestedPerson : MonoBehaviour
     [Header("수갑 퀘스트")]
     [SerializeField] private int displayCount = 2;  // 말풍선에 표시되는 수 (실제 필요 = +1)
 
-
     [Header("변신")]
-    [SerializeField] private GameObject[] prisonerPrefabs;  // Prisoner1, Prisoner2 등록
+    [SerializeField] private GameObject[] prisonerPrefabs;
     [SerializeField] private GameObject transformParticlePrefab;
     [SerializeField] private Transform jailDestination;
 
@@ -32,11 +31,14 @@ public class ArrestedPerson : MonoBehaviour
 
     public System.Action OnTransformed;
 
-    private Transform _destination;
     private HandcuffReceiveZone _zone;
     private int _totalNeeded;
     private int _receivedCount;
     private Animator _anim;
+
+    // 웨이포인트
+    private Transform[] _waypoints;
+    private int _waypointIndex;
 
     public int DisplayCount => displayCount;
     public int TotalNeeded => _totalNeeded;
@@ -47,52 +49,65 @@ public class ArrestedPerson : MonoBehaviour
         _totalNeeded = displayCount + 1;
     }
 
-    public void Initialize(Transform destination, HandcuffReceiveZone zone, Transform jailDest, TakeMoneyZone moneyZone)
+    public void Initialize(HandcuffReceiveZone zone, Transform jailDest, TakeMoneyZone moneyZone)
     {
-        _destination = destination;
-        _zone = zone;
+        _zone         = zone;
         jailDestination = jailDest;
         takeMoneyZone = moneyZone;
+    }
+
+    public void SetWaypoints(Transform[] waypoints)
+    {
+        _waypoints     = waypoints;
+        _waypointIndex = 0;
     }
 
     private void Update()
     {
         if (CurrentState != State.Walking) return;
-        if (_destination == null) return;
+        if (_waypoints == null || _waypoints.Length == 0) return;
 
-        Vector3 target = GetMoveTarget();
-        Vector3 flatSelf = new Vector3(transform.position.x, 0f, transform.position.z);
-        Vector3 flatTarget = new Vector3(target.x, 0f, target.z);
+        // 앞 사람이 GapDistance 이내에 있으면 대기
+        if (IsBlockedByPersonAhead())
+        {
+            _anim?.SetBool("IsWalking", false);
+            return;
+        }
+
+        Vector3 target     = _waypoints[_waypointIndex].position;
+        Vector3 flatSelf   = new Vector3(transform.position.x, 0f, transform.position.z);
+        Vector3 flatTarget = new Vector3(target.x,             0f, target.z);
         float dist = Vector3.Distance(flatSelf, flatTarget);
 
         if (dist > stopDistance)
         {
             Vector3 dir = (flatTarget - flatSelf).normalized;
             transform.position += dir * walkSpeed * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(dir);
+            transform.rotation  = Quaternion.LookRotation(dir);
             _anim?.SetBool("IsWalking", true);
         }
         else
         {
-            _anim?.SetBool("IsWalking", false);
+            // 현재 웨이포인트 도달 — 다음으로 전진
+            if (_waypointIndex < _waypoints.Length - 1)
+                _waypointIndex++;
+            else
+                _anim?.SetBool("IsWalking", false); // 마지막 웨이포인트: 트리거 대기
         }
     }
 
-    private Vector3 GetMoveTarget()
+    private bool IsBlockedByPersonAhead()
     {
-        // 앞 사람이 없거나 이미 Done이면 → HandcuffReceiveZone으로
-        if (PersonAhead == null || PersonAhead.CurrentState == State.Done)
-            return _destination.position;
-
-        // 앞 사람 뒤 GapDistance 위치 유지
-        Vector3 toZone = (_destination.position - PersonAhead.transform.position).normalized;
-        return PersonAhead.transform.position - toZone * GapDistance;
+        if (PersonAhead == null || PersonAhead.CurrentState == State.Done) return false;
+        float dx = PersonAhead.transform.position.x - transform.position.x;
+        float dz = PersonAhead.transform.position.z - transform.position.z;
+        return dx * dx + dz * dz <= GapDistance * GapDistance;
     }
 
     /// <summary>HandcuffReceiveZone에 도달했을 때 호출.</summary>
     public void OnReachedZone(HandcuffReceiveZone zone)
     {
-        _zone = zone;
+        _zone       = zone;
         CurrentState = State.Waiting;
         _anim?.SetBool("IsWalking", false);
     }
@@ -112,7 +127,6 @@ public class ArrestedPerson : MonoBehaviour
 
     private IEnumerator CompleteQuest()
     {
-        Debug.Log("CompleteQuest 시작");
         CurrentState = State.Done;
 
         if (transformParticlePrefab != null)
@@ -123,7 +137,6 @@ public class ArrestedPerson : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
-        // 죄수 변신 — 랜덤 선택
         if (prisonerPrefabs != null && prisonerPrefabs.Length > 0)
         {
             int idx = Random.Range(0, prisonerPrefabs.Length);
@@ -133,15 +146,12 @@ public class ArrestedPerson : MonoBehaviour
                 pc.SetDestination(jailDestination);
         }
 
-        // 죄수 스폰 직후 체포자 렌더러 숨김
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
             r.enabled = false;
 
-        // 존 점유 해제
         _zone?.OnOccupantCleared();
         OnTransformed?.Invoke();
 
-        // 코인 투척 완료 후 비활성화
         yield return StartCoroutine(ThrowCoins());
 
         gameObject.SetActive(false);

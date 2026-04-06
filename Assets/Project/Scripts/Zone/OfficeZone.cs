@@ -14,7 +14,7 @@ public class OfficeZone : Zone
     protected override void OnPlayerEnter(PlayerController player)
     {
         _presenceCount++;
-        TryDropHandcuffs();
+        TryDropHandcuffs(carrier);
     }
 
     protected override void OnPlayerExit(PlayerController player)
@@ -25,6 +25,7 @@ public class OfficeZone : Zone
     protected override void OnAlbaEnter(AlbaController alba)
     {
         _presenceCount++;
+        TryDropHandcuffs(alba.GetComponent<HandcuffCarrier>());
     }
 
     protected override void OnAlbaExit(AlbaController alba)
@@ -32,27 +33,25 @@ public class OfficeZone : Zone
         _presenceCount = Mathf.Max(0, _presenceCount - 1);
     }
 
-    private void TryDropHandcuffs()
+    private void TryDropHandcuffs(HandcuffCarrier c)
     {
-        if (carrier == null || carrier.TotalCount == 0) return;
+        if (c == null || c.TotalCount == 0) return;
         if (dropZone == null) return;
 
-        var list = carrier.TakeAll();
+        var list = c.TakeAll();
         if (list.Count > 0) dropZone.Receive(list);
 
-        // 아직 날아오는 중인 수갑이 있으면 도착할 때마다 드랍존으로 전달
-        if (!_draining && carrier.PendingCount > 0)
-            StartCoroutine(DrainPending());
+        if (!_draining && c.PendingCount > 0)
+            StartCoroutine(DrainPending(c));
     }
 
-    // carrier.TotalCount > 0인 동안 매 프레임 새로 도착한 수갑을 드랍존으로 넘김
-    private IEnumerator DrainPending()
+    private IEnumerator DrainPending(HandcuffCarrier c)
     {
         _draining = true;
-        while (carrier.TotalCount > 0)
+        while (c.TotalCount > 0)
         {
             yield return null;
-            var arrived = carrier.TakeAll();
+            var arrived = c.TakeAll();
             if (arrived.Count > 0) dropZone.Receive(arrived);
         }
         _draining = false;
