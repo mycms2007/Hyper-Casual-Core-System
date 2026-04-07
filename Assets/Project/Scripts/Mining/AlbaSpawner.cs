@@ -8,6 +8,7 @@ public class AlbaSpawner : MonoBehaviour
 
     [Header("소환 지점")]
     [SerializeField] private Transform spawnPoint;
+    [SerializeField] private float spawnYOffset = 0f;
 
     [Header("씬 참조 주입")]
     [SerializeField] private HandcuffStackZone handcuffStackZone;
@@ -29,7 +30,8 @@ public class AlbaSpawner : MonoBehaviour
         }
 
         Debug.Log("[AlbaSpawner] Instantiate 시작");
-        GameObject albaObj = Instantiate(albaPrefab, spawnPoint.position, spawnPoint.rotation);
+        Vector3 spawnPos = spawnPoint.position + Vector3.up * spawnYOffset;
+        GameObject albaObj = Instantiate(albaPrefab, spawnPos, spawnPoint.rotation);
         albaObj.transform.SetParent(null);
 
         AlbaController alba = albaObj.GetComponent<AlbaController>();

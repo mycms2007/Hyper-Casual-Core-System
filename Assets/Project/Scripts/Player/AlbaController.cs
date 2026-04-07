@@ -49,8 +49,6 @@ public class AlbaController : MonoBehaviour
         _anim    = GetComponentInChildren<Animator>();
         _carrier = GetComponent<HandcuffCarrier>();
         IsHired  = true;
-
-        Debug.Log($"[AlbaController] Awake — carrier={(_carrier != null ? "OK" : "NULL")}, albaAnchor={(albaAnchor != null ? "OK" : "NULL")}");
     }
 
     private void OnEnable()
@@ -184,4 +182,7 @@ public class AlbaController : MonoBehaviour
     {
         _anim?.SetBool("IsWalking", walking);
     }
+
+    // 클립에 내장된 Animation Event 수신 (알바는 아무것도 하지 않음)
+    private void OnMiningHit() { }
 }

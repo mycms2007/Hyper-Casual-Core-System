@@ -1532,6 +1532,7 @@ GameObject:
   - component: {fileID: 3103691487562339675}
   - component: {fileID: 7873522258316497390}
   - component: {fileID: 363671634304593115}
+  - component: {fileID: 407576512274978363}
   m_Layer: 0
   m_Name: Alba
   m_TagString: Untagged
@@ -1642,6 +1643,27 @@ CapsuleCollider:
   m_Height: 2.24
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
+--- !u!95 &407576512274978363
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4903889709325024324}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: c612c23df1319e54889002d806582eea, type: 3}
+  m_Controller: {fileID: 9100000, guid: 12b0a1f818f162a4cadb63fa7d4063bb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4944116374371158702
 GameObject:
   m_ObjectHideFlags: 0
