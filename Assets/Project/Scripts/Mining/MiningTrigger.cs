@@ -51,7 +51,11 @@ public class MiningTrigger : MonoBehaviour
         {
             while (!ore.IsDead) ore.TakeDamage();
             _isMining = true;
-            if (player != null) player.SetForceIdle(true);
+            if (player != null)
+            {
+                player.SetForceIdle(true);
+                player.SetDrillSpeedBoost(true);
+            }
         }
 
         UpdateMiningState();
@@ -117,7 +121,11 @@ public class MiningTrigger : MonoBehaviour
         _isMining = false;
         if (player != null && !IsDrillEquipped) player.SetMiningActive(false);
         if (drillObject != null) drillObject.SetActive(false);
-        if (player != null) player.SetForceIdle(false);
+        if (player != null)
+        {
+            player.SetForceIdle(false);
+            player.SetDrillSpeedBoost(false);
+        }
         _miningOffCoroutine = null;
     }
 

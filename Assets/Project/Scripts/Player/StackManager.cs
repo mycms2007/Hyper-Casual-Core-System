@@ -14,6 +14,9 @@ public class StackManager : MonoBehaviour
     private Vector3 _prevPos;
 
     public int Count => _stack.Count;
+    public int Capacity => maxCapacity;
+
+    public void SetCapacity(int capacity) => maxCapacity = capacity;
 
     private Transform _originalRootParent;
     private Vector3 _originalRootLocalPos;

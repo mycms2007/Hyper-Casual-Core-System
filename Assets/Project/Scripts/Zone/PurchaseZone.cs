@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public enum ActivationTrigger { None, Prerequisite, FirstMoney, JailFull }
 
 /// <summary>
-/// 플레이어가 holdDuration 동안 서있으면 구매되는 존.
+/// 플레이어가 서 있는 동안 일정 간격으로 돈을 드레인해서 구매하는 존.
 /// 활성화 조건: None(즉시), Prerequisite(선행존), FirstMoney(첫 돈 수령), JailFull(감옥 20명)
 ///
 /// zoneVisual이 연결되어 있으면 해당 오브젝트를 스프링 애니메이션 타겟으로 사용.
@@ -16,8 +16,13 @@ public class PurchaseZone : MonoBehaviour
 {
     [Header("구매 설정")]
     [SerializeField] private int price;
-    [SerializeField] private float holdDuration = 3f;
     [SerializeField] private float purchaseCooldown = 0f;
+
+    [Header("코인 드레인")]
+    [SerializeField] private float drainInterval = 0.12f;
+    [SerializeField] private int drainAmountPerTick = 5;
+    [SerializeField] private GameObject coinFlyPrefab;
+    [SerializeField] private float coinFlyDuration = 0.35f;
 
     [Header("활성화 조건")]
     [SerializeField] private ActivationTrigger trigger = ActivationTrigger.None;
@@ -35,7 +40,9 @@ public class PurchaseZone : MonoBehaviour
     private bool _purchased;
     private bool _ready;
     private bool _isHolding;
-    private float _holdProgress;
+    private int  _paidAmount;
+    private float _drainTimer;
+    private Transform _playerTransform;
 
     private Transform _visualTarget;  // 애니메이션 타겟 (zoneVisual 또는 self)
     private bool _usingSelf;          // true면 self 애니메이션 — SetActive 대신 scale 0 유지
@@ -70,7 +77,7 @@ public class PurchaseZone : MonoBehaviour
             _usingSelf = true;
         }
 
-        _originalScale = _visualTarget.localScale;  // 제로 세팅 전에 원래 크기 저장
+        _originalScale = _visualTarget.localScale;
         _visualTarget.localScale = Vector3.zero;
         if (fillImage != null) fillImage.fillAmount = 0f;
 
@@ -88,20 +95,30 @@ public class PurchaseZone : MonoBehaviour
             OnTriggerConditionMet();
         }
 
-        if (_isHolding && !_purchased && _ready)
-        {
-            _holdProgress -= Time.deltaTime / holdDuration;
-            if (fillImage != null) fillImage.fillAmount = _holdProgress;
-            if (_holdProgress <= 0f)
-            {
-                _holdProgress = 0f;
-                if (fillImage != null) fillImage.fillAmount = 0f;
-                if (PlayerWallet.Instance != null && PlayerWallet.Instance.Spend(price))
-                    Purchase();
-                else
-                    _isHolding = false;
-            }
-        }
+        if (!_isHolding || _purchased || !_ready) return;
+
+        _drainTimer -= Time.deltaTime;
+        if (_drainTimer > 0f) return;
+
+        _drainTimer = drainInterval;
+
+        int remaining = price - _paidAmount;
+        int toDrain   = Mathf.Min(drainAmountPerTick, remaining);
+
+        if (PlayerWallet.Instance == null || !PlayerWallet.Instance.Spend(toDrain))
+            return; // 돈 부족 — 다음 틱에 재시도
+
+        _paidAmount += toDrain;
+
+        if (fillImage != null && price > 0)
+            fillImage.fillAmount = (float)_paidAmount / price;
+
+        // 코인 날아가는 연출
+        if (coinFlyPrefab != null && _playerTransform != null)
+            StartCoroutine(FlyCoinToZone(_playerTransform.position));
+
+        if (_paidAmount >= price)
+            Purchase();
     }
 
     private void OnTriggerConditionMet()
@@ -129,25 +146,24 @@ public class PurchaseZone : MonoBehaviour
         if (_purchased || !_ready) return;
         if (other.GetComponentInParent<PlayerController>() == null) return;
 
-        _isHolding = true;
-        _holdProgress = 1f;
-        if (fillImage != null) fillImage.fillAmount = 1f;
+        _playerTransform = other.GetComponentInParent<PlayerController>().transform;
+        _isHolding  = true;
+        _drainTimer = 0f; // 진입 즉시 첫 드레인
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.GetComponentInParent<PlayerController>() == null) return;
 
-        _isHolding = false;
-        _holdProgress = 0f;
-        if (fillImage != null) fillImage.fillAmount = 0f;
+        _isHolding       = false;
+        _playerTransform = null;
     }
 
     private void Purchase()
     {
         _purchased = true;
         _isHolding = false;
-        if (fillImage != null) fillImage.fillAmount = 0f;
+        if (fillImage != null) fillImage.fillAmount = price > 0 ? 1f : 0f;
 
         foreach (GameObject target in activateTargets)
             if (target != null) target.SetActive(true);
@@ -155,10 +171,8 @@ public class PurchaseZone : MonoBehaviour
         if (delayedActivateTargets != null && delayedActivateTargets.Length > 0)
             StartCoroutine(DelayedActivate());
 
-        // 퇴장 애니메이션 후 시각 요소 정리
         if (!_usingSelf)
         {
-            // zoneVisual을 제외한 나머지(존 플랫폼/UI)만 즉시 숨기고, visual은 애니메이션 후 숨김
             foreach (Renderer r in GetComponentsInChildren<Renderer>())
                 if (!r.transform.IsChildOf(_visualTarget) && r.transform != _visualTarget)
                     r.enabled = false;
@@ -169,9 +183,44 @@ public class PurchaseZone : MonoBehaviour
         }
         else
         {
-            // self 모드: 애니메이션 자체가 시각 정리 — scale 0이 되면 충분
             StartCoroutine(SpringDisappear(_visualTarget, null));
         }
+    }
+
+    private IEnumerator FlyCoinToZone(Vector3 from)
+    {
+        GameObject coin = Instantiate(coinFlyPrefab, from, Quaternion.identity);
+        Vector3 target  = transform.position + Vector3.up * 0.5f;
+        float elapsed   = 0f;
+
+        while (elapsed < coinFlyDuration)
+        {
+            if (coin == null) yield break;
+            elapsed += Time.deltaTime;
+            float t   = Mathf.Clamp01(elapsed / coinFlyDuration);
+            Vector3 p = Vector3.Lerp(from, target, t);
+            p.y += Mathf.Sin(t * Mathf.PI) * 1.2f;
+            coin.transform.position = p;
+            yield return null;
+        }
+
+        if (coin != null) StartCoroutine(ShrinkAndDestroy(coin));
+    }
+
+    private IEnumerator ShrinkAndDestroy(GameObject coin)
+    {
+        if (coin == null) yield break;
+        float duration = 0.12f;
+        float elapsed  = 0f;
+        Vector3 start  = coin.transform.localScale;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            if (coin == null) yield break;
+            coin.transform.localScale = Vector3.Lerp(start, Vector3.zero, elapsed / duration);
+            yield return null;
+        }
+        if (coin != null) Destroy(coin);
     }
 
     private IEnumerator DelayedActivate()

@@ -35,13 +35,19 @@ public class DrillCar : MonoBehaviour
     [SerializeField] private MoneyCarrier moneyCarrier;
     [SerializeField] private HandcuffCarrier handcuffCarrier;
 
+    [Header("구매 후 적재량")]
+    [SerializeField] private int gemCapacityAfterPurchase = 30;
+
     public bool IsPurchased { get; private set; }
+    public bool IsDriving => _isDriving;
 
     /// <summary>DrillCarUnlock(PurchaseZone activateTargets)에서 호출.</summary>
     public void Purchase()
     {
         IsPurchased = true;
-        Debug.Log("[DrillCar] Purchase() — 드릴차 구매 완료");
+        if (gemCarrier != null)
+            gemCarrier.SetCapacity(gemCapacityAfterPurchase);
+        Debug.Log($"[DrillCar] Purchase() — 드릴차 구매 완료, gem 최대적재 {gemCapacityAfterPurchase}으로 증가");
     }
 
     private bool _isDriving;

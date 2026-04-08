@@ -11,8 +11,11 @@ public class HandcuffReceiveZone : MonoBehaviour
     [SerializeField] private Image fillImage;
     [SerializeField] private float bubbleHeightOffset = 2.5f;
 
+    [SerializeField] private float fillLerpSpeed = 8f;
+
     private ArrestedPerson _currentOccupant;
     private Camera _cam;
+    private float _targetFill;
 
     public bool IsOccupied => _currentOccupant != null;
     public ArrestedPerson CurrentOccupant => _currentOccupant;
@@ -25,6 +28,9 @@ public class HandcuffReceiveZone : MonoBehaviour
 
     private void Update()
     {
+        if (fillImage != null)
+            fillImage.fillAmount = Mathf.Lerp(fillImage.fillAmount, _targetFill, fillLerpSpeed * Time.deltaTime);
+
         if (_currentOccupant == null || speechBubble == null || !speechBubble.activeSelf) return;
 
         Vector3 worldPos = _currentOccupant.transform.position + Vector3.up * bubbleHeightOffset;
@@ -48,7 +54,7 @@ public class HandcuffReceiveZone : MonoBehaviour
     {
         int remaining = Mathf.Max(0, displayCount - received);
         if (countText != null) countText.text = $"x{remaining}";
-        if (fillImage != null) fillImage.fillAmount = (float)received / totalNeeded;
+        _targetFill = (float)received / totalNeeded;
     }
 
     public void HideBubble()
@@ -65,6 +71,8 @@ public class HandcuffReceiveZone : MonoBehaviour
     private void ShowBubble(int displayCount, int totalNeeded)
     {
         if (speechBubble != null) speechBubble.SetActive(true);
+        _targetFill = 0f;
+        if (fillImage != null) fillImage.fillAmount = 0f;
         UpdateBubble(0, totalNeeded, displayCount);
     }
 }

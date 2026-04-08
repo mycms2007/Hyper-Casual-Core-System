@@ -37,6 +37,7 @@ public class GemDropZone : Zone
     protected override void OnPlayerEnter(PlayerController player)
     {
         if (_isCollecting) return;
+        if (DrillCar.Instance != null && DrillCar.Instance.IsDriving) return;
         if (playerStack == null || playerStack.Count == 0) return;
 
         _isCollecting = true;

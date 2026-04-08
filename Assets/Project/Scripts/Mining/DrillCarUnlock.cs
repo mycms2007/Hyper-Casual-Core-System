@@ -8,6 +8,7 @@ public class DrillCarUnlock : MonoBehaviour
 {
     private void OnEnable()
     {
+        Debug.Log($"[DrillCarUnlock] OnEnable 호출됨 — DrillCar.Instance: {(DrillCar.Instance != null ? "OK" : "NULL")}");
         if (DrillCar.Instance != null)
             DrillCar.Instance.Purchase();
         else

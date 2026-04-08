@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -11,14 +12,25 @@ public class MoneyCarrier : MonoBehaviour
     [SerializeField] private StackManager stackManager;
     [SerializeField] private GameObject coinPrefab;
     [SerializeField] private int wonPerCoin = 15;
+    [SerializeField] private float coinAddInterval = 0.12f;
 
     private void Awake() => Instance = this;
 
     public void AddMoney(int amount)
     {
         int count = amount / wonPerCoin;
+        if (count > 0)
+            StartCoroutine(AddCoinsStaggered(count));
+    }
+
+    private IEnumerator AddCoinsStaggered(int count)
+    {
         for (int i = 0; i < count; i++)
+        {
             stackManager.TryAdd(coinPrefab);
+            if (i < count - 1)
+                yield return new WaitForSeconds(coinAddInterval);
+        }
     }
 
     public void AttachAnchorTo(Transform newParent) => stackManager.AttachRootTo(newParent);

@@ -116,12 +116,15 @@ public class TakeMoneyZone : MonoBehaviour
         List<GameObject> toCollect = new List<GameObject>(_stack);
         _stack.Clear();
 
-        int stackIndex = 0;
-        foreach (GameObject coin in toCollect)
+        int coinsPerLayer = cols * rows;
+        int iterIndex = 0;
+        for (int i = toCollect.Count - 1; i >= 0; i--)
         {
+            GameObject coin = toCollect[i];
             if (coin == null) continue;
-            StartCoroutine(FlyToPlayer(coin, stackIndex));
-            stackIndex++;
+            int layer = iterIndex / coinsPerLayer;
+            StartCoroutine(FlyToPlayer(coin, layer));
+            iterIndex++;
             yield return new WaitForSeconds(collectInterval);
         }
 

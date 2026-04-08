@@ -82,6 +82,7 @@
     <Compile Include="Assets\Project\Scripts\Mining\MinerAnimEvent.cs" />
     <Compile Include="Assets\Project\Scripts\Player\CameraFollow.cs" />
     <Compile Include="Assets\Project\Scripts\Player\MoneyCarrier.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\CelebrationEffect.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\ItemTransZone.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\DynamicJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\UI\FaceCamera.cs" />
@@ -89,9 +90,11 @@
     <Compile Include="Assets\Project\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\ArrestedPath.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\MinerSpawner.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\EndPanelController.cs" />
     <Compile Include="Assets\Project\Scripts\Player\GemCarrier.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\TakeMoneyZone.cs" />
+    <Compile Include="Assets\Project\Scripts\Mining\GemCapacityExpander.cs" />
     <Compile Include="Assets\Project\Scripts\Player\StackItem.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\DrillSurface.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\PrisonerController.cs" />
@@ -100,9 +103,11 @@
     <Compile Include="Assets\Project\Scripts\Arrested\JailManager.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\Ore.cs" />
     <Compile Include="Assets\Project\Scripts\Player\StackManager.cs" />
+    <Compile Include="Assets\Project\Scripts\Arrested\JailAnimator.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\ProcessingMachine.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\ZoneUnlocker.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\GemMaxIndicator.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\Zone.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\DrillUnlock.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\ArrestedSpawner.cs" />
@@ -110,6 +115,8 @@
     <Compile Include="Assets\Project\Scripts\Zone\ArrowAnimation.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\MinerUpZone.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\JailCheckpoint.cs" />
+    <Compile Include="Assets\Project\Scripts\Arrested\JailExpander.cs" />
+    <Compile Include="Assets\Project\Scripts\Arrested\JailCounterUI.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\OfficeZone.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Examples\JoystickPlayerExample.cs" />
   </ItemGroup>

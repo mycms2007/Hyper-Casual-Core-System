@@ -6,6 +6,7 @@ public enum PlayerState { Idle, Walk }
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float drillSpeedMultiplier = 1.5f;
     [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] private Joystick joystick;
     [SerializeField] private Camera cam;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
     private bool _isMining;
     private bool _forceIdle;
     private bool _movementLocked;
+    private float _currentSpeed;
     private Vector3 _originalScale;
 
     private void Awake()
@@ -31,6 +33,7 @@ public class PlayerController : MonoBehaviour
         _camForward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
         _camRight   = Vector3.ProjectOnPlane(cam.transform.right,   Vector3.up).normalized;
 
+        _currentSpeed = moveSpeed;
         ChangeState(PlayerState.Idle);
     }
 
@@ -95,6 +98,11 @@ public class PlayerController : MonoBehaviour
     public void SetForceIdle(bool force)
     {
         _forceIdle = force;
+    }
+
+    public void SetDrillSpeedBoost(bool active)
+    {
+        _currentSpeed = active ? moveSpeed * drillSpeedMultiplier : moveSpeed;
     }
 
     /// <summary>DrillCar 탑승 시 이동 잠금.</summary>
@@ -170,7 +178,7 @@ public class PlayerController : MonoBehaviour
     private void Move(Vector2 input)
     {
         Vector3 dir = (_camForward * input.y + _camRight * input.x).normalized;
-        rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + dir * _currentSpeed * Time.fixedDeltaTime);
     }
 
     private void Rotate(Vector2 input)

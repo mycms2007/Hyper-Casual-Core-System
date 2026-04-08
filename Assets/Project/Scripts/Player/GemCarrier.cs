@@ -22,6 +22,9 @@ public class GemCarrier : MonoBehaviour
     }
 
     public int Count => stackManager.Count;
+    public int Capacity => stackManager.Capacity;
+
+    public void SetCapacity(int capacity) => stackManager.SetCapacity(capacity);
 
     public void AttachAnchorTo(Transform newParent) => stackManager.AttachRootTo(newParent);
     public void RestoreAnchor() => stackManager.DetachRoot();
