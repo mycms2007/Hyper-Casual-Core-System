@@ -18,6 +18,7 @@ public class GemDropZone : Zone
     private List<GameObject> _stackedGems = new List<GameObject>();
     private Vector3 _zoneBasePos;
     private Vector3 _stackDir;
+    private int _activeMinerGems;
 
     private void Awake()
     {
@@ -36,6 +37,8 @@ public class GemDropZone : Zone
 
     protected override void OnPlayerEnter(PlayerController player)
     {
+        TutorialManager.Instance?.OnPlayerEnteredGemDropZone();
+
         if (_isCollecting) return;
         if (DrillCar.Instance != null && DrillCar.Instance.IsDriving) return;
         if (playerStack == null || playerStack.Count == 0) return;
@@ -47,8 +50,15 @@ public class GemDropZone : Zone
         StartCoroutine(CollectGems());
     }
 
+    protected override void OnPlayerExit(PlayerController player)
+    {
+        TutorialManager.Instance?.OnPlayerExitedGemDropZone();
+    }
+
     private IEnumerator CollectGems()
     {
+        TutorialManager.Instance?.OnGemDropStarted();
+
         // TakeAll: index 0(바닥) → last(맨 위) 순서
         List<GameObject> toFly = playerStack.TakeAll();
 
@@ -86,6 +96,7 @@ Vector3 targetPos = GetStackPosition(index);
     private void OnAllGemLanded()
     {
         _isCollecting = false;
+        TutorialManager.Instance?.OnAllGemsDropped();
         if (machine != null)
             machine.ReceiveGems(new List<GameObject>(_stackedGems));
         _stackedGems.Clear();
@@ -141,5 +152,51 @@ Vector3 targetPos = GetStackPosition(index);
         float y = (index / 2) * ySpacing;
         Vector3 sideOffset = _stackDir * side;
         return _zoneBasePos + stackBaseOffset + Vector3.up * y + sideOffset;
+    }
+
+    // ── 광부 gem 직접 전달 ──────────────────────────────────────────
+
+    public void AddMinerGem(GameObject gemPrefab)
+    {
+        StartCoroutine(SpawnMinerGem(gemPrefab));
+    }
+
+    private IEnumerator SpawnMinerGem(GameObject gemPrefab)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        _zoneBasePos = transform.position;
+        _stackDir = Quaternion.Euler(0f, stackAngleDegrees, 0f) * Vector3.forward;
+
+        int index = _activeMinerGems;
+        _activeMinerGems++;
+
+        Vector3 targetPos = GetStackPosition(index);
+        GameObject gem = Instantiate(gemPrefab, targetPos, Quaternion.Euler(landingRotation));
+        Vector3 originalScale = gem.transform.localScale;
+        gem.transform.localScale = Vector3.zero;
+
+        yield return StartCoroutine(SpringInGem(gem, originalScale));
+
+        _activeMinerGems--;
+        if (machine != null)
+            machine.ReceiveGems(new List<GameObject> { gem });
+    }
+
+    private IEnumerator SpringInGem(GameObject gem, Vector3 originalScale)
+    {
+        float duration = 0.45f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            if (gem == null) yield break;
+            elapsed += Time.deltaTime;
+            float p = Mathf.Clamp01(elapsed / duration);
+            float s = 1f - Mathf.Exp(-7f * p) * Mathf.Cos(12f * p);
+            gem.transform.localScale = originalScale * Mathf.Clamp(s, 0f, 1f);
+            yield return null;
+        }
+        if (gem != null)
+            gem.transform.localScale = originalScale;
     }
 }

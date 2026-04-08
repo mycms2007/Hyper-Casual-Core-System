@@ -34,6 +34,11 @@ public class MinerWorker : MonoBehaviour
     [Header("광석 뺏김 후 대기")]
     [SerializeField] private float pauseDuration = 1f;
 
+    [Header("Gem Drop Zone")]
+    [SerializeField] private GemDropZone gemDropZone;
+
+    public void SetGemDropZone(GemDropZone zone) => gemDropZone = zone;
+
     private Rigidbody _rb;
     private Animator _anim;
     private State _state;
@@ -124,7 +129,8 @@ public class MinerWorker : MonoBehaviour
     public void OnMiningHit()
     {
         if (_state != State.Mining) return;
-        _targetOre?.TakeDamage();
+        if (_targetOre != null)
+            _targetOre.TakeDamageByMiner(gemDropZone);
     }
 
     private void UpdatePause()

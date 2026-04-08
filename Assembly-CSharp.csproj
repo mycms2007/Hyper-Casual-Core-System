@@ -70,6 +70,8 @@
     <Compile Include="Assets\Project\Scripts\Zone\HandcuffDropZone.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Examples\JoystickSetterExample.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\PurchaseZone.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\HandcuffStackMaxIndicator.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\TutorialManager.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\DrillCarUnlock.cs" />
     <Compile Include="Assets\Project\Scripts\UI\HUDManager.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\TakeMoneyZone.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\GemCapacityExpander.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\FlatArrow.cs" />
     <Compile Include="Assets\Project\Scripts\Player\StackItem.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\DrillSurface.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\PrisonerController.cs" />

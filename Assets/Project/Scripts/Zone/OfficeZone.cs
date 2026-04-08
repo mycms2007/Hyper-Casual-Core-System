@@ -39,7 +39,11 @@ public class OfficeZone : Zone
         if (dropZone == null) return;
 
         var list = c.TakeAll();
-        if (list.Count > 0) dropZone.Receive(list);
+        if (list.Count > 0)
+        {
+            dropZone.Receive(list);
+            TutorialManager.Instance?.OnFirstHandcuffDropped();
+        }
 
         if (!_draining && c.PendingCount > 0)
             StartCoroutine(DrainPending(c));

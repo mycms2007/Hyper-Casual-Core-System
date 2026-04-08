@@ -13,6 +13,9 @@ public class HandcuffStackZone : Zone
     [SerializeField] private Vector3 stackBaseOffset = Vector3.zero;
     [SerializeField] private Vector3 handcuffSpawnRotation = new Vector3(90f, 0f, 0f);
 
+    [Header("용량 설정")]
+    [SerializeField] private int maxCapacity = 30;
+
     [Header("픽업 설정")]
     [SerializeField] private HandcuffCarrier carrier;
     [SerializeField] private Transform playerAnchor;
@@ -27,6 +30,7 @@ public class HandcuffStackZone : Zone
     private bool _isTransferring;
 
     public int StackCount => _stackedHandcuffs.Count;
+    public int MaxCapacity => maxCapacity;
 
     private void Awake()
     {
@@ -61,12 +65,16 @@ public class HandcuffStackZone : Zone
     {
         for (int i = 0; i < count; i++)
         {
+            if (_stackedHandcuffs.Count >= maxCapacity)
+                yield break;
+
             int index = _stackedHandcuffs.Count;
             Vector3 pos = GetStackPosition(index);
             GameObject handcuff = Instantiate(handcuffPrefab, pos, Quaternion.Euler(handcuffSpawnRotation));
             Vector3 originalScale = handcuff.transform.localScale;
             handcuff.transform.localScale = Vector3.zero;
             _stackedHandcuffs.Add(handcuff);
+            TutorialManager.Instance?.OnFirstHandcuffProduced();
 
             StartCoroutine(ExpandScale(handcuff.transform, originalScale));
             yield return new WaitForSeconds(spawnInterval);
@@ -110,6 +118,7 @@ public class HandcuffStackZone : Zone
 
     private IEnumerator TransferToPlayer()
     {
+        TutorialManager.Instance?.OnFirstHandcuffPickup();
         int originalCount = _stackedHandcuffs.Count;
 
         for (int i = 0; i < originalCount; i++) carrier.ReservePending();

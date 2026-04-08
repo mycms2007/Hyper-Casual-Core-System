@@ -42,6 +42,8 @@ public class TakeMoneyZone : MonoBehaviour
     /// <summary>ArrestedPerson이 코인을 넘기면 TakeMoneyZone이 비행+착지를 책임진다.</summary>
     public void LaunchCoin(GameObject coin, Vector3 from, float flyDuration)
     {
+        if (_reservedCount == 0)
+            TutorialManager.Instance?.OnFirstCoinLaunched();
         Vector3 target = GetGridPosition(_reservedCount);
         _reservedCount++;
         StartCoroutine(FlyCoin(coin, from, target, flyDuration));
@@ -106,6 +108,7 @@ public class TakeMoneyZone : MonoBehaviour
 
     private IEnumerator CollectCoins()
     {
+        TutorialManager.Instance?.OnFirstMoneyPickup();
         _isCollecting = true;
         _pendingCollect = true;
 

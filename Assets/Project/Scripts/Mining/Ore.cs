@@ -15,6 +15,7 @@ public class Ore : MonoBehaviour
     private bool _isDead;
     private bool _isClaimed;
     private Vector3 _originalScale;
+    private GemDropZone _minerDropZone;
 
     public bool IsDead => _isDead;
     public bool IsClaimed => _isClaimed;
@@ -35,6 +36,18 @@ public class Ore : MonoBehaviour
 
     public void TakeDamage()
     {
+        _minerDropZone = null;
+        TakeDamageInternal();
+    }
+
+    public void TakeDamageByMiner(GemDropZone dropZone)
+    {
+        _minerDropZone = dropZone;
+        TakeDamageInternal();
+    }
+
+    private void TakeDamageInternal()
+    {
         if (_isDead) return;
         _currentHp--;
         if (_currentHp <= 0)
@@ -48,15 +61,25 @@ public class Ore : MonoBehaviour
         if (oreBreakEffect != null)
             Instantiate(oreBreakEffect, transform.position, Quaternion.identity);
 
-        Debug.Log($"[Ore] Die() — gemPrefab: {(gemPrefab != null ? gemPrefab.name : "NULL")}, _gemCarrier: {(_gemCarrier != null ? "OK" : "NULL")}");
-        if (gemPrefab != null && _gemCarrier != null)
-            _gemCarrier.TryAdd(gemPrefab);
+        if (gemPrefab != null)
+        {
+            if (_minerDropZone != null)
+            {
+                _minerDropZone.AddMinerGem(gemPrefab);
+            }
+            else if (_gemCarrier != null)
+            {
+                _gemCarrier.TryAdd(gemPrefab);
+                TutorialManager.Instance?.OnFirstMining();
+            }
+        }
 
         OreManager.Instance.ScheduleRespawn(this, _spawnPoint);
     }
 
     public void Respawn()
     {
+        _minerDropZone = null;
         _isDead = false;
         _isClaimed = false;
         _currentHp = maxHp;

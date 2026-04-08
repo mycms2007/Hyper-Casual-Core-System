@@ -13,8 +13,12 @@ public class MinerSpawner : MonoBehaviour
     [Header("소환 지점 (위치 + 방향 모두 적용)")]
     [SerializeField] private Transform[] spawnPoints;
 
+    [Header("Gem Drop Zone")]
+    [SerializeField] private GemDropZone gemDropZone;
+
     private void OnEnable()
     {
+        Debug.Log($"[MinerSpawner] OnEnable 실행 — 오브젝트명: {gameObject.name}");
         if (minerPrefab == null)
         {
             Debug.LogWarning("[MinerSpawner] minerPrefab이 연결되지 않았습니다.");
@@ -25,7 +29,8 @@ public class MinerSpawner : MonoBehaviour
         {
             if (point == null) continue;
             GameObject miner = Instantiate(minerPrefab, point.position, point.rotation);
-            miner.transform.SetParent(null); // 월드 루트로 분리
+            miner.transform.SetParent(null);
+            miner.GetComponent<MinerWorker>()?.SetGemDropZone(gemDropZone);
         }
     }
 }
