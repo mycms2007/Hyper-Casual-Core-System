@@ -44,11 +44,16 @@ public class EndPanelController : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q) && !_opened)
-        {
-            _opened = true;
-            endPanel.SetActive(true);
-            StartCoroutine(PlaySequence());
-        }
+            OpenPanel();
+    }
+
+    public void OpenPanel()
+    {
+        if (_opened) return;
+        _opened = true;
+        endPanel.SetActive(true);
+        SFXManager.Instance?.PlayEndPanel();
+        StartCoroutine(PlaySequence());
     }
 
     // ── 메인 시퀀스 ───────────────────────────────────────────────

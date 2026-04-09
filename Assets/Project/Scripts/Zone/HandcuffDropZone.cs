@@ -13,6 +13,9 @@ public class HandcuffDropZone : MonoBehaviour
     [SerializeField] private AnimationCurve bounceCurve;
     [SerializeField] private float bounceDuration = 0.25f;
 
+    [Header("용량 설정")]
+    [SerializeField] private int maxCapacity = 40;
+
     private readonly List<GameObject> _stack = new List<GameObject>();
     private readonly Queue<List<GameObject>> _receiveQueue = new Queue<List<GameObject>>();
     private bool _isReceiving;
@@ -53,7 +56,13 @@ public class HandcuffDropZone : MonoBehaviour
             GameObject handcuff = handcuffs[i];
             if (handcuff == null) continue;
 
-            int slot = _reservedCount++;  // null 아닌 것만 슬롯 소비
+            if (_reservedCount >= maxCapacity)
+            {
+                Destroy(handcuff);
+                continue;
+            }
+
+            int slot = _reservedCount++;
             Vector3 target = GetStackPosition(slot);
             StartCoroutine(FlyAndLand(handcuff, target, () => _stack.Add(handcuff)));
 

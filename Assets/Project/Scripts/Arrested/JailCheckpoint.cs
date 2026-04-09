@@ -9,6 +9,9 @@ using UnityEngine;
 public class JailCheckpoint : MonoBehaviour
 {
     private readonly List<PrisonerController> _waiting = new List<PrisonerController>();
+    private static bool _locked;
+
+    public static void LockForVideo() => _locked = true;
 
     private void Awake()
     {
@@ -26,7 +29,7 @@ public class JailCheckpoint : MonoBehaviour
         if (prisoner == null) return;
         if (JailManager.Instance == null) return;
 
-        if (JailManager.Instance.IsFull)
+        if (JailManager.Instance.IsFull || _locked)
         {
             prisoner.Pause();
             _waiting.Add(prisoner);
@@ -44,6 +47,8 @@ public class JailCheckpoint : MonoBehaviour
 
     private void ReleaseWaiting()
     {
+        if (JailAnimator.IsVideoVersion) return;
+
         while (_waiting.Count > 0 && !JailManager.Instance.IsFull)
         {
             PrisonerController p = _waiting[0];

@@ -21,7 +21,7 @@ public class AlbaController : MonoBehaviour
     [SerializeField] private float initDelay = 0.2f;
     [SerializeField] private float collectDuration = 3f;
     [SerializeField] private float searchInterval = 2f;
-    [SerializeField] private float idleWaitDuration = 2f;
+    [SerializeField] private float idleWaitDuration = 3f;
 
     [Header("참조 (AlbaSpawner가 주입)")]
     private HandcuffStackZone handcuffStackZone;

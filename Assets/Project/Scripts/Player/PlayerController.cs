@@ -109,6 +109,13 @@ public class PlayerController : MonoBehaviour
     public void SetMovementLocked(bool locked)
     {
         _movementLocked = locked;
+        if (locked)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            ChangeState(PlayerState.Idle);
+            ApplyAnimator();
+        }
     }
 
     /// <summary>DrillCar 탑승 시 플레이어 렌더러 숨김/표시.</summary>

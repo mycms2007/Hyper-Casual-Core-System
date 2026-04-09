@@ -124,6 +124,7 @@ Vector3 targetPos = GetStackPosition(index);
 
         gem.transform.position = target;
         gem.transform.rotation = Quaternion.Euler(landingRotation);
+        SFXManager.Instance?.PlayGemDrop();
 
         // 착지 바운스
         yield return StartCoroutine(BounceScale(gem.transform));
@@ -176,6 +177,7 @@ Vector3 targetPos = GetStackPosition(index);
         Vector3 originalScale = gem.transform.localScale;
         gem.transform.localScale = Vector3.zero;
 
+        SFXManager.Instance?.PlayGemDrop();
         yield return StartCoroutine(SpringInGem(gem, originalScale));
 
         _activeMinerGems--;

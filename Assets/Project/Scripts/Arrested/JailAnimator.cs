@@ -14,6 +14,8 @@ using UnityEngine;
 public class JailAnimator : MonoBehaviour
 {
     [SerializeField] private bool videoVersion;
+    public static bool IsVideoVersion { get; private set; }
+    public static event System.Action OnCelebrationPlayed;
 
     [Header("공통 오브젝트")]
     [SerializeField] private Transform jailWall;
@@ -46,6 +48,7 @@ public class JailAnimator : MonoBehaviour
 
     private void Awake()
     {
+        IsVideoVersion = videoVersion;
         JailCounterUI.OnDisplayFull    += OnDisplayFull;
         JailManager.OnCapacityExpanded += OnCapacityExpanded;
     }
@@ -116,6 +119,8 @@ public class JailAnimator : MonoBehaviour
 
     private IEnumerator VideoExpansion()
     {
+        JailCheckpoint.LockForVideo(); // 체크포인트 잠금 — 이후 죄수 진입 차단
+
         // 1. Door 하강
         Vector3 doorHidden = _doorTarget - Vector3.up * doorHideOffset;
         yield return StartCoroutine(MoveObject(jailDoor, jailDoor.position, doorHidden, moveDuration));
@@ -136,6 +141,7 @@ public class JailAnimator : MonoBehaviour
         // 5. 침대 완료(0.45s) + 0.2초 후 축하 이펙트
         yield return new WaitForSeconds(0.45f + 0.2f);
         celebrationEffect?.Play();
+        OnCelebrationPlayed?.Invoke();
     }
 
     // ── 실제버전 시퀀스 ───────────────────────────────────────────

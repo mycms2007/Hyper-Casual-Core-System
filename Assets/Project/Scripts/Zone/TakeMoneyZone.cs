@@ -21,6 +21,9 @@ public class TakeMoneyZone : MonoBehaviour
     [SerializeField] private float collectFlyDuration = 0.3f;
     [SerializeField] private float collectInterval = 0.05f;
 
+    [Header("용량 설정")]
+    [SerializeField] private int maxCapacity = 60;   // 10층 × 6개 = 150원
+
     private readonly List<GameObject> _stack = new List<GameObject>();
     private int _reservedCount;
     private int _totalMoney;
@@ -42,6 +45,11 @@ public class TakeMoneyZone : MonoBehaviour
     /// <summary>ArrestedPerson이 코인을 넘기면 TakeMoneyZone이 비행+착지를 책임진다.</summary>
     public void LaunchCoin(GameObject coin, Vector3 from, float flyDuration)
     {
+        if (_reservedCount >= maxCapacity)
+        {
+            Destroy(coin);
+            return;
+        }
         if (_reservedCount == 0)
             TutorialManager.Instance?.OnFirstCoinLaunched();
         Vector3 target = GetGridPosition(_reservedCount);
@@ -119,6 +127,8 @@ public class TakeMoneyZone : MonoBehaviour
         List<GameObject> toCollect = new List<GameObject>(_stack);
         _stack.Clear();
 
+        PlayerWallet.Instance?.Add(moneyToAdd);
+
         int coinsPerLayer = cols * rows;
         int iterIndex = 0;
         for (int i = toCollect.Count - 1; i >= 0; i--)
@@ -130,8 +140,6 @@ public class TakeMoneyZone : MonoBehaviour
             iterIndex++;
             yield return new WaitForSeconds(collectInterval);
         }
-
-        PlayerWallet.Instance?.Add(moneyToAdd);
         yield return new WaitForSeconds(collectFlyDuration);
         _pendingCollect = false;
         _isCollecting = false;

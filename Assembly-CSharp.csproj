@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Project\Scripts\Arrested\ArrestedPerson.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\SFXManager.cs" />
     <Compile Include="Assets\Project\Scripts\Zone\HandcuffStackZone.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\MinerWorker.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\PrisonerPath.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Assets\Project\Scripts\Mining\DrillSurface.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\PrisonerController.cs" />
     <Compile Include="Assets\Project\Scripts\Player\PlayerWallet.cs" />
+    <Compile Include="Assets\Project\Scripts\UI\CinematicDirector.cs" />
     <Compile Include="Assets\ThirdParty\Joystick Pack\Scripts\Base\Joystick.cs" />
     <Compile Include="Assets\Project\Scripts\Arrested\JailManager.cs" />
     <Compile Include="Assets\Project\Scripts\Mining\Ore.cs" />
@@ -1019,6 +1021,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>Library\ScriptAssemblies\com.unity.cinemachine.editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1085,6 +1091,10 @@
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow">

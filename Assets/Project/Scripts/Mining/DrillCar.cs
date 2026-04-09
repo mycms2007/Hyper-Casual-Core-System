@@ -1,3 +1,4 @@
+using Cinemachine;
 using UnityEngine;
 
 public class DrillCar : MonoBehaviour
@@ -28,7 +29,8 @@ public class DrillCar : MonoBehaviour
 
     [Header("참조")]
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private CameraFollow cameraFollow;
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
+    [SerializeField] private Transform cameraTarget; // DrillCar 자식 빈 오브젝트
     [SerializeField] private GameObject drillObject;
     [SerializeField] private Camera cam;
     [SerializeField] private GemCarrier gemCarrier;
@@ -120,6 +122,7 @@ public class DrillCar : MonoBehaviour
         _debugInputLogged = false;
         _lastDriveDir = Vector3.zero;
         _isDriving = true;
+        SFXManager.Instance?.PlayDrilling();
 
         // 캐리어 이전을 SetVisible(false) 전에 수행
         // → SetVisible은 GetComponentsInChildren<Renderer>() 로 player 하위 렌더러를 전부 끄는데,
@@ -134,7 +137,8 @@ public class DrillCar : MonoBehaviour
             playerController.enabled = false;
             playerController.SetVisible(false);
         }
-        if (cameraFollow != null) cameraFollow.SetTarget(transform);
+        if (virtualCamera != null && cameraTarget != null)
+            virtualCamera.Follow = cameraTarget;
     }
 
     private void Update()
@@ -211,8 +215,8 @@ public class DrillCar : MonoBehaviour
     private void EndDrive()
     {
         _isDriving = false;
+        SFXManager.Instance?.FadeDrilling();
         if (visual != null) visual.SetActive(false);
-        if (cameraFollow != null) cameraFollow.ReturnToPlayer();
 
         if (_player != null)
         {
@@ -225,8 +229,6 @@ public class DrillCar : MonoBehaviour
                       $"\n  → 입력 로그가 찍혔나요? [{(_debugInputLogged ? "YES - 실제 이동 문제" : "NO - 너무 빨리 종료됨")}]");
             _player.transform.position = restorePos;
 
-            // PlayerController 재활성화 전에 rotation을 마지막 드라이브 방향으로 맞춤
-            // → PlayerController.Rotate()가 LookRotation(dir)을 쓰므로 이미 맞춰져 있으면 스핀 없음
             if (_lastDriveDir.sqrMagnitude > 0.01f)
                 _player.transform.rotation = Quaternion.LookRotation(_lastDriveDir);
 
@@ -236,6 +238,9 @@ public class DrillCar : MonoBehaviour
                 playerController.enabled = true;
             }
         }
+
+        if (virtualCamera != null && _player != null)
+            virtualCamera.Follow = _player.transform;
 
         gemCarrier?.RestoreAnchor();
         moneyCarrier?.RestoreAnchor();
