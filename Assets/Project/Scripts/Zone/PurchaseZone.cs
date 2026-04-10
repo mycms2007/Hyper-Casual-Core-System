@@ -37,9 +37,13 @@ public class PurchaseZone : MonoBehaviour
     [SerializeField] private GameObject[] delayedActivateTargets;
     [SerializeField] private float delayedActivateDelay = 0f;
 
+    [Header("효과음 설정")]
+    [SerializeField] private int soundTriggerOffset = 5; // 완료 몇 원 전에 효과음 재생
+
     private bool _purchased;
     private bool _ready;
     private bool _isHolding;
+    private bool _soundPlayed;
     private int  _paidAmount;
     private float _drainTimer;
     private Transform _playerTransform;
@@ -116,6 +120,12 @@ public class PurchaseZone : MonoBehaviour
         // 코인 날아가는 연출
         if (coinFlyPrefab != null && _playerTransform != null)
             StartCoroutine(FlyCoinToZone(_playerTransform.position));
+
+        if (!_soundPlayed && _paidAmount >= price - soundTriggerOffset)
+        {
+            _soundPlayed = true;
+            SFXManager.Instance?.PlayZonePurchase();
+        }
 
         if (_paidAmount >= price)
             Purchase();

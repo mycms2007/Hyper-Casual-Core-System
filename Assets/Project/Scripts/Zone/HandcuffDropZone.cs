@@ -90,6 +90,7 @@ public class HandcuffDropZone : MonoBehaviour
         if (handcuff == null) yield break;
         handcuff.transform.position = target;
         handcuff.transform.rotation = Quaternion.Euler(landingRotation);
+        SFXManager.Instance?.PlayHandcuffDrop(target);
 
         yield return StartCoroutine(BounceScale(handcuff.transform));
         onLanded?.Invoke();

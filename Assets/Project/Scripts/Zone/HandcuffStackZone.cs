@@ -76,6 +76,7 @@ public class HandcuffStackZone : Zone
             _stackedHandcuffs.Add(handcuff);
             TutorialManager.Instance?.OnFirstHandcuffProduced();
 
+            SFXManager.Instance?.PlayHandcuffStack(pos);
             StartCoroutine(ExpandScale(handcuff.transform, originalScale));
             yield return new WaitForSeconds(spawnInterval);
         }

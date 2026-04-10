@@ -55,13 +55,6 @@ public class CinematicDirector : MonoBehaviour
         StartCoroutine(ShowCam(expansionZoneCam, expansionCamDelay, expansionCamHold));
     }
 
-    private void OnCapacityExpanded()
-    {
-        if (!JailAnimator.IsVideoVersion) return;
-        if (overviewCam != null) overviewCam.Priority = 11;
-        player?.SetMovementLocked(true);
-    }
-
     private void OnCelebrationPlayed()
     {
         if (!JailAnimator.IsVideoVersion) return;
@@ -74,11 +67,24 @@ public class CinematicDirector : MonoBehaviour
     {
         if (cam == null) yield break;
         yield return new WaitForSeconds(delay);
+        SFXManager.Instance?.GlobalFadeOut();
         cam.Priority = 11;
         player?.SetMovementLocked(true);
+        DrillCar.SetInputLocked(true);
         yield return new WaitForSeconds(hold);
         cam.Priority = 0;
         player?.SetMovementLocked(false);
+        DrillCar.SetInputLocked(false);
+        SFXManager.Instance?.GlobalFadeIn();
+    }
+
+    private void OnCapacityExpanded()
+    {
+        if (!JailAnimator.IsVideoVersion) return;
+        if (overviewCam != null) overviewCam.Priority = 11;
+        player?.SetMovementLocked(true);
+        DrillCar.SetInputLocked(true);
+        SFXManager.Instance?.GlobalFadeOut();
     }
 
     private IEnumerator ReturnFromOverview()
@@ -86,6 +92,7 @@ public class CinematicDirector : MonoBehaviour
         yield return new WaitForSeconds(overviewReturnDelay);
         if (overviewCam != null) overviewCam.Priority = 0;
         player?.SetMovementLocked(false);
+        DrillCar.SetInputLocked(false);
         yield return new WaitForSeconds(endPanelDelay);
         endPanel?.OpenPanel();
     }

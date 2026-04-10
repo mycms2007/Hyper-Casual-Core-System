@@ -58,6 +58,7 @@ public class Ore : MonoBehaviour
     {
         _isDead = true;
         _mesh.enabled = false;
+        SFXManager.Instance?.PlayOreBreak(transform.position);
         if (oreBreakEffect != null)
             Instantiate(oreBreakEffect, transform.position, Quaternion.identity);
 

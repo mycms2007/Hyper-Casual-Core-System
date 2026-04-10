@@ -154,6 +154,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>Mining 애니메이션 34프레임 Animation Event에서 호출됩니다.</summary>
     public void OnMiningHit()
     {
+        SFXManager.Instance?.PlayMining();
         if (miningTrigger != null) miningTrigger.DealDamage();
     }
 

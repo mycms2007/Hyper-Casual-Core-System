@@ -28,6 +28,7 @@ public class DrillCar : MonoBehaviour
     [SerializeField] private Transform handcuffAnchor;
 
     [Header("참조")]
+    [SerializeField] private MiningTrigger miningTrigger;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private Transform cameraTarget; // DrillCar 자식 빈 오브젝트
@@ -51,6 +52,9 @@ public class DrillCar : MonoBehaviour
             gemCarrier.SetCapacity(gemCapacityAfterPurchase);
         Debug.Log($"[DrillCar] Purchase() — 드릴차 구매 완료, gem 최대적재 {gemCapacityAfterPurchase}으로 증가");
     }
+
+    private static bool _inputLocked;
+    public static void SetInputLocked(bool locked) => _inputLocked = locked;
 
     private bool _isDriving;
     private GameObject _player;
@@ -144,6 +148,7 @@ public class DrillCar : MonoBehaviour
     private void Update()
     {
         if (!_isDriving) return;
+        if (_inputLocked) return;
 
         if (cam != null)
         {
@@ -241,6 +246,8 @@ public class DrillCar : MonoBehaviour
 
         if (virtualCamera != null && _player != null)
             virtualCamera.Follow = _player.transform;
+
+        miningTrigger?.StartDrillCarCooldown();
 
         gemCarrier?.RestoreAnchor();
         moneyCarrier?.RestoreAnchor();

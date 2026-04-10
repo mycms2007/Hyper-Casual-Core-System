@@ -10,10 +10,13 @@ public class MiningTrigger : MonoBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private GameObject drillObject; // 손 드릴 프리팹
 
+    [SerializeField] private float drillCarCooldown = 1f;
+
     private List<Ore> _oresInRange = new List<Ore>();
     private bool _isMining;
     private Coroutine _miningOffCoroutine;
     private bool _drillPurchased;
+    private bool _drillCarCooldownActive;
 
     public void UnlockDrill()
     {
@@ -24,12 +27,28 @@ public class MiningTrigger : MonoBehaviour
     private bool IsDrillEquipped => drillObject != null && drillObject.activeSelf;
     private bool IsDrillCarPurchased => DrillCar.Instance != null && DrillCar.Instance.IsPurchased;
 
+    public void StartDrillCarCooldown()
+    {
+        StartCoroutine(DrillCarCooldownRoutine());
+    }
+
+    private IEnumerator DrillCarCooldownRoutine()
+    {
+        _drillCarCooldownActive = true;
+        yield return new WaitForSeconds(drillCarCooldown);
+        _drillCarCooldownActive = false;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         Ore ore = other.GetComponent<Ore>();
         if (ore == null || _oresInRange.Contains(ore)) return;
 
         _oresInRange.Add(ore);
+
+        // 드릴차 켜져 있거나 쿨다운 중이면 채굴 차단
+        if (DrillCar.Instance != null && DrillCar.Instance.IsDriving) return;
+        if (_drillCarCooldownActive) return;
 
         // 드릴차 구매 완료 → 드릴차 발진
         Debug.Log($"[MiningTrigger] 광물 감지 — Instance={DrillCar.Instance != null}, IsPurchased={DrillCar.Instance?.IsPurchased}, _drillPurchased={_drillPurchased}");
@@ -44,6 +63,7 @@ public class MiningTrigger : MonoBehaviour
         {
             Debug.Log($"[MiningTrigger] drillObject.SetActive(true) 호출");
             drillObject.SetActive(true);
+            SFXManager.Instance?.PlayDrilling();
         }
 
         // 손 드릴 장착 → 즉사
@@ -87,6 +107,9 @@ public class MiningTrigger : MonoBehaviour
 
     private void UpdateMiningState()
     {
+        if (DrillCar.Instance != null && DrillCar.Instance.IsDriving) return;
+        if (_drillCarCooldownActive) return;
+
         bool hasOre = GetClosestOre() != null;
 
         if (hasOre)
@@ -120,7 +143,11 @@ public class MiningTrigger : MonoBehaviour
         yield return new WaitForSeconds(delay);
         _isMining = false;
         if (player != null && !IsDrillEquipped) player.SetMiningActive(false);
-        if (drillObject != null) drillObject.SetActive(false);
+        if (drillObject != null)
+        {
+            drillObject.SetActive(false);
+            SFXManager.Instance?.FadeDrilling();
+        }
         if (player != null)
         {
             player.SetForceIdle(false);

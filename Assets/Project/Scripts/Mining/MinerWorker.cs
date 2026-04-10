@@ -129,6 +129,7 @@ public class MinerWorker : MonoBehaviour
     public void OnMiningHit()
     {
         if (_state != State.Mining) return;
+        SFXManager.Instance?.PlayMinerMining(transform.position);
         if (_targetOre != null)
             _targetOre.TakeDamageByMiner(gemDropZone);
     }

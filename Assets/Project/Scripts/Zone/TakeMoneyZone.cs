@@ -74,6 +74,7 @@ public class TakeMoneyZone : MonoBehaviour
         if (coin != null)
         {
             coin.transform.position = target;
+            SFXManager.Instance?.PlayMoneyDrop();
             if (_pendingCollect)
                 StartCoroutine(ShrinkAndDestroy(coin));
             else
