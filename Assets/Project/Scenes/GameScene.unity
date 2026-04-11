@@ -4093,6 +4093,7 @@ MonoBehaviour:
   fillImage: {fileID: 1094709970}
   delayedActivateTargets: []
   delayedActivateDelay: 0
+  soundTriggerOffset: 5
 --- !u!4 &292105338 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4753713205229766, guid: 4d41b434ca339f145a0cd7b7d980488d, type: 3}
@@ -5374,6 +5375,7 @@ MonoBehaviour:
   gemAnchor: {fileID: 1981552627}
   moneyAnchor: {fileID: 1830732896}
   handcuffAnchor: {fileID: 1454965730}
+  miningTrigger: {fileID: 0}
   playerController: {fileID: 8472242759616458184}
   virtualCamera: {fileID: 132267522}
   cameraTarget: {fileID: 1997033175}
@@ -6331,18 +6333,29 @@ MonoBehaviour:
   drillingClip: {fileID: 8300000, guid: 028b06eace8aadd41829fd1dfc62bbd9, type: 3}
   endPanelClip: {fileID: 8300000, guid: 82d89fd4cebf46b4ea08349d59207cda, type: 3}
   gemDropClip: {fileID: 8300000, guid: b211c1ae309053848ac4626db7c19cf1, type: 3}
-  handcuffDropClip: {fileID: 8300000, guid: 2892d53f5af018a4cb918780aa83b2d2, type: 3}
+  handcuffDropClip: {fileID: 8300000, guid: 1ec5810163aaa42409c39dd7660dc76d, type: 3}
+  handcuffStackClip: {fileID: 8300000, guid: 1ec5810163aaa42409c39dd7660dc76d, type: 3}
   miningClip: {fileID: 8300000, guid: f5996f101bb89024d96d443547c4417f, type: 3}
-  minerMiningClip: {fileID: 0}
+  minerMiningClip: {fileID: 8300000, guid: f5996f101bb89024d96d443547c4417f, type: 3}
   moneyDropClip: {fileID: 8300000, guid: 8e9ce5e346939374097a7017ac763bf5, type: 3}
   oreBreakClip: {fileID: 8300000, guid: 01a0eb366150e7f4e9cd649568bff965, type: 3}
   zonePurchaseClip: {fileID: 8300000, guid: ac5b4d3cfe8a5a84894d7e52efecf8ff, type: 3}
   drillingVolume: 1
-  handcuffDropVolume: 7
-  minerMiningVolume: 1
-  moneyDropVolume: 0.5
+  endPanelVolume: 0.35
+  gemDropVolume: 0.35
+  handcuffDropVolume: 1
+  handcuffStackVolume: 1
+  miningVolume: 0.5
+  minerMiningVolume: 0.5
+  moneyDropVolume: 0.2
+  oreBreakVolume: 1
+  zonePurchaseVolume: 1
+  minerAudioMaxDistance: 15
+  oreBreakMaxDistance: 15
+  handcuffDropMaxDistance: 15
+  handcuffStackMaxDistance: 15
   drillingFadeDuration: 0.5
-  endPanelDelay: 0.3
+  endPanelDelay: 0.2
   globalFadeDuration: 1.5
 --- !u!1 &482076047
 GameObject:
@@ -9687,6 +9700,7 @@ MonoBehaviour:
   drillOffDelay: 1
   player: {fileID: 8472242759616458184}
   drillObject: {fileID: 2005823246}
+  drillCarCooldown: 1
 --- !u!136 &702993800
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -17131,8 +17145,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 23.1775, y: -69.7777}
-  m_SizeDelta: {x: 452.3368, y: 358.0332}
+  m_AnchoredPosition: {x: 3.9485, y: -74.5849}
+  m_SizeDelta: {x: 391.4448, y: 303.5507}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1277335698
 MonoBehaviour:
@@ -19276,6 +19290,7 @@ MonoBehaviour:
   delayedActivateTargets:
   - {fileID: 1561613340}
   delayedActivateDelay: 1
+  soundTriggerOffset: 5
 --- !u!1 &1427215709
 GameObject:
   m_ObjectHideFlags: 3
@@ -19616,8 +19631,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5, y: 145}
-  m_SizeDelta: {x: 478.2924, y: 330.6569}
+  m_AnchoredPosition: {x: 3.0121, y: 124.1685}
+  m_SizeDelta: {x: 394.9666, y: 288.9939}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1453804015
 MonoBehaviour:
@@ -21224,6 +21239,7 @@ MonoBehaviour:
   fillImage: {fileID: 1520597242}
   delayedActivateTargets: []
   delayedActivateDelay: 0
+  soundTriggerOffset: 5
 --- !u!65 &1561613343
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24670,6 +24686,7 @@ MonoBehaviour:
   delayedActivateTargets:
   - {fileID: 205112530}
   delayedActivateDelay: 0.1
+  soundTriggerOffset: 5
 --- !u!1 &1836432102
 GameObject:
   m_ObjectHideFlags: 0
@@ -27047,6 +27064,7 @@ MonoBehaviour:
   - {fileID: 282513336}
   - {fileID: 1426259757}
   delayedActivateDelay: 3
+  soundTriggerOffset: 5
 --- !u!1 &2015326763
 GameObject:
   m_ObjectHideFlags: 0
@@ -30236,7 +30254,7 @@ MonoBehaviour:
   gemFlyDuration: 0.27
   shrinkDuration: 0.2
   expandDuration: 0.3
-  conveyorDuration: 0.8
+  conveyorDuration: 0.5
   handcuffSpawnRotation: {x: 90, y: 0, z: 0}
   itemTransZone: {fileID: 7918435206767965581}
 --- !u!65 &8879114193034263893
